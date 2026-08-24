@@ -1,305 +1,268 @@
-# arxiv2zh Design Specification
-
-Date: 2026-08-24
-
-## Summary
-
-arxiv2zh is a Zotero 7-9 plugin that sends arXiv papers through
-[hjfy.top](https://hjfy.top/), waits for the Chinese PDF, and imports the
-result into Zotero. The primary workflow starts from selected Zotero items or
-PDF attachments. A secondary Tools menu command accepts a pasted arXiv URL and
-creates a preprint item when no Zotero item is selected.
-
-The plugin uses a native Zotero workflow with an embedded first-party login
-window. The Zotero/Firefox profile persists the hjfy.top session cookie. The
-plugin never stores passwords or copies cookies into ordinary preferences.
+# arxiv2zh 设计规格
 
-## Goals
-
-- Accept current and legacy arXiv IDs and URLs.
-- Resolve arXiv IDs from selected Zotero items and attachments.
-- Support single-item and multi-item batch translation.
-- Reuse an hjfy.top login across Zotero sessions.
-- Poll task state, download the translated PDF, validate it, and import it as
-  a child attachment.
-- Create a metadata-rich Zotero preprint item for direct URL submissions when
-  there is no selected item.
-- Provide low-interruption progress plus a task panel for details and recovery.
-- Resume unfinished local tasks after Zotero restarts.
-- Run and debug on the installed Zotero 9.0.6 while retaining Zotero 7-9
-  manifest compatibility.
+日期：2026-08-24
 
-## Non-Goals
+## 概述
 
-- Uploading arbitrary local PDFs.
-- Supporting non-Chinese target languages.
-- Hosting or reimplementing the hjfy.top translation service.
-- Storing hjfy.top account passwords.
-- Cancelling a remote translation; the observed service exposes no cancel
-  endpoint.
-- Synchronizing task history through Zotero Sync.
-
-## Observed Service Contract
-
-The current hjfy.top web application uses these endpoints:
-
-- `GET /api/arxivInfo/{id}` returns arXiv Atom metadata and `hasSrc`.
-- `GET /api/arxivStatus/{id}` returns a task status and progress text.
-- `GET /api/arxivFiles/{id}` returns `id`, `title`, `origin`, `zhCN`,
-  `zhCNTar`, and `isDeepSeek` after completion.
-- A top-level response status of `101` means that login is required.
-- The web application polls every 10 seconds and treats `finished`, `failed`,
-  `error`, and `fault` as terminal states.
-- Loading `/arxiv/{id}` in an authenticated first-party page creates or
-  resumes a task. The plugin delegates task creation to this page rather than
-  inventing an undocumented submission request.
-
-The endpoints are publicly reachable but are not a documented public API.
-All protocol details therefore belong in one `HjfyClient` adapter. UI, task,
-metadata, and attachment modules consume normalized domain objects only.
+arxiv2zh 是一个兼容 Zotero 7-9 的插件。它通过
+[hjfy.top](https://hjfy.top/) 翻译 arXiv 论文，等待中文 PDF 生成后将结果
+导入 Zotero。主要工作流从选中的 Zotero 条目或 PDF 附件启动；工具菜单还提供
+直接粘贴 arXiv 地址的入口。当没有选中 Zotero 条目时，插件会自动创建预印本
+条目。
 
-## Architecture
-
-### Interaction Layer
+插件采用原生 Zotero 工作流，并通过内嵌的第一方登录窗口完成 hjfy.top 登录。
+登录 Cookie 由 Zotero/Firefox 配置目录持久保存。插件不保存密码，也不会把
+Cookie 复制到普通偏好设置中。
 
-- `ContextMenuController` registers the item/attachment submenu.
-- `QuickInputDialog` accepts a pasted arXiv URL or ID.
-- `TaskPanelController` owns the toolbar badge and right-side task panel.
-- `PreferencesController` manages the small settings surface.
+## 目标
 
-### Core Layer
+- 接受新版、旧版及带版本号的 arXiv ID 和地址。
+- 从选中的 Zotero 条目及附件中自动识别 arXiv ID。
+- 支持单条目与多条目批量翻译。
+- 跨 Zotero 会话复用 hjfy.top 登录状态。
+- 轮询任务状态，下载并校验中文 PDF，然后导入为子附件。
+- 直接提交地址且未选中 Zotero 条目时，自动创建包含元数据的预印本条目。
+- 提供低打扰的进度提示，以及可查看详情和恢复任务的任务面板。
+- Zotero 重启后恢复未完成的本地任务。
+- 以本机 Zotero 9.0.6 为实际调试目标，同时保持 Zotero 7-9 清单兼容。
 
-- `ArxivResolver` extracts and normalizes IDs from direct input, item URL,
-  DOI, Extra, and attachment source fields.
-- `TaskManager` performs deduplication, batch scheduling, polling, persistence,
-  recovery, and task-state transitions.
-- `SessionManager` opens the embedded first-party hjfy.top login/account page
-  and clears only hjfy.top cookies when the user signs out.
-- `MetadataService` parses the Atom response and creates a Zotero preprint item
-  when needed.
-- `ResultImporter` downloads, validates, names, imports, and optionally opens
-  translated PDFs.
-
-### Boundary Layer
-
-- `HjfyClient` maps raw hjfy.top responses to typed results and typed errors.
-- `ZoteroAdapter` wraps menu, window, item, attachment, storage, and Reader APIs.
-- `TaskStore` persists task records in
-  `Zotero.DataDirectory.dir/arxiv2zh/tasks.json` using atomic replacement.
+## 非目标
 
-Modules expose narrow interfaces so a service contract change does not affect
-Zotero item or UI code.
+- 上传任意本地 PDF。
+- 支持中文以外的目标语言。
+- 托管或重新实现 hjfy.top 翻译服务。
+- 保存 hjfy.top 账号密码。
+- 取消远端翻译任务；目前观察到的服务没有提供取消接口。
+- 通过 Zotero Sync 同步任务历史。
 
-## User Experience
-
-### Entry Points
-
-The item context menu contains an `arxiv2zh` submenu:
-
-- Translate to Chinese
-- Download Again
-- View on hjfy.top
-
-The Tools menu contains:
+## 已确认的服务协议
 
-- Enter arXiv URL
-- Translation Tasks
-- Login / Account
+当前 hjfy.top Web 应用使用以下接口：
 
-The toolbar icon shows the number of active tasks. Clicking it opens a compact
-right-side task panel. A Tools menu fallback opens the same panel if a toolbar
-integration is unavailable on a supported Zotero version.
-
-### ID Resolution
-
-For selected items, the resolver checks the item URL, DOI, Extra, and attachment
-source metadata in that order. It accepts modern IDs such as `2501.14787v2`
-and legacy IDs such as `hep-th/9901001v1`. Versions are preserved for remote
-lookup, while a versionless base ID is retained for duplicate checks and
-fallback lookup.
-
-If automatic resolution fails, the quick input dialog opens with the selected
-item retained as the attachment target.
-
-### Task Panel
-
-Task states are:
-
-- Waiting for login
-- Queued
-- Translating
-- Downloading
-- Importing
-- Completed
-- Failed
-- Stopped locally
-
-Each row shows the arXiv ID, paper title when known, current detail, elapsed
-time, and the relevant commands: open website, retry, open attachment, stop
-local polling, or remove history. Removing history never deletes a Zotero
-item or attachment.
-
-Normal work uses a non-modal progress notification. The task panel is opened
-only when the user wants details. Completing one paper opens the attachment by
-default; a batch completion shows a summary without opening multiple readers.
-
-### Attachments and Duplicates
-
-The stored filename is `{normalizedArxivId}_zh_CN.pdf`. The Zotero attachment
-title is `Chinese Translation - arxiv2zh` in English and
-`中文翻译 - arxiv2zh` in Chinese.
-
-The duplicate key is the Zotero library, parent item, and versionless arXiv ID.
-Normal translation skips an existing completed attachment. `Download Again`
-retrieves a fresh file and replaces only the plugin-owned attachment after the
-new PDF has passed validation; it does not delete unrelated translation files.
-
-### Direct URL Without a Selection
-
-The plugin parses the Atom XML returned by `arxivInfo` with `DOMParser`. It
-creates a Zotero preprint item containing the supported title, creators,
-abstract, publication date, arXiv identifier, categories, and canonical URL,
-then attaches the translated PDF. It does not download the original PDF.
-
-When a target item already exists, the plugin does not overwrite user-edited
-bibliographic fields.
-
-## Authentication and Session Handling
-
-When a status response indicates login is required, `SessionManager` opens a
-Zotero content browser on `https://hjfy.top/arxiv/{id}`. Phone, WeChat, CAPTCHA,
-and other authentication remain entirely inside the first-party page. Zotero's
-Firefox cookie store persists the resulting session in the selected Zotero
-profile.
-
-The plugin does not inspect form fields, capture credentials, log cookies, or
-serialize cookies into plugin preferences. The account command reopens the
-first-party page. `Clear Session` removes cookies scoped to hjfy.top and its
-subdomains, after an explicit confirmation.
-
-Once login completes, the first-party page creates or resumes the remote task.
-The plugin continues polling the public status endpoint. A login window opened
-for a waiting task closes automatically as soon as the status is no longer
-login-required. An account window opened explicitly from the Tools menu stays
-open until the user closes it. Multiple waiting tasks share one login session
-and resume automatically.
-
-## Task Data and Persistence
-
-Each stored task contains:
-
-- Local task ID and deduplication key
-- Normalized and versionless arXiv IDs
-- Library, target item, and attachment IDs when available
-- Paper title and source URL when available
-- State, progress detail, attempt count, and last error
-- Created, updated, started, and completed timestamps
-- Whether the task is a forced re-download
-
-Active tasks are written after every state transition. On startup, queued and
-non-terminal tasks resume polling. Completed and failed history is retained for
-30 days by default and pruned without touching Zotero data.
-
-## Main Data Flow
-
-1. Resolve and normalize the arXiv ID.
-2. Build the deduplication key and check local tasks and attachments.
-3. Query `arxivStatus`.
-4. If login is required, open the first-party login/task page and keep the
-   local task in `waiting-login`.
-5. Poll every 10 seconds until a terminal state or the 30-minute local timeout.
-6. On completion, request `arxivFiles` immediately before download.
-7. Download `zhCN`, verify the PDF, and write an ASCII-only temporary filename.
-8. Create metadata when required and import the attachment into Zotero storage.
-9. Clean the temporary file, persist completion, notify the user, and open the
-   Reader only for an eligible single task.
-
-## Error Handling
-
-- Network errors, HTTP 429, and HTTP 5xx use bounded exponential backoff.
-- A local task times out after 30 minutes but can be resumed or retried without
-  blindly creating another remote task.
-- Batch tasks are isolated; one failure never aborts other papers.
-- Signed download URLs are never persisted. `arxivFiles` is fetched again for
-  every download retry.
-- A downloaded file must contain `%PDF-` within its first 1 KiB and `%%EOF`
-  within its last 64 KiB before import.
-- Temporary files are removed in `finally` blocks.
-- Missing LaTeX source, translation failure, compilation failure, login expiry,
-  invalid response shape, and attachment import failure are separate typed
-  errors with user-facing recovery actions.
-- Unknown response fields are ignored. Missing required fields produce a
-  service-compatibility error rather than a misleading generic failure.
-- The default service URL must use HTTPS. HTTP is accepted only for localhost
-  and `127.0.0.1` development endpoints.
-
-## Preferences
-
-- Service URL, default `https://hjfy.top`
-- Open a completed single translation, default enabled
-- Polling interval, default 10 seconds with a safe minimum of 5 seconds
-- Completed/failed history retention, default 30 days
-
-Login state is displayed but not stored as a preference. Account and cookie
-controls are commands, not preference values.
-
-## Testing and Debugging
-
-### Unit Tests
-
-- Modern, versioned, PDF, alphaXiv, and legacy arXiv input parsing
-- Item-field resolution priority and invalid input
-- State transitions, deduplication, batch isolation, timeout, and restart
-  recovery
-- Raw response validation and typed error mapping
-- Atom metadata parsing
-- Attachment naming and duplicate ownership rules
-- PDF header/EOF validation
-
-### Contract and Integration Tests
-
-- Mock `arxivInfo`, `arxivStatus`, and `arxivFiles` responses for successful,
-  login-required, translating, failed, malformed, and expired-link paths.
-- Verify startup, context and Tools menus, preferences, task-panel rendering,
-  preprint creation, attachment import, Reader opening, and persisted-task
-  recovery inside Zotero.
-- Use known completed paper `2501.14787` for a live smoke test of status, signed
-  URL refresh, download, PDF validation, and attachment import.
-- Run one new-task login flow. The user completes phone/WeChat/CAPTCHA input in
-  the first-party window; automated debugging resumes after authentication.
-
-### Release Checks
-
-- TypeScript type checking
-- Prettier and ESLint checks
-- Unit and Zotero integration tests
-- Production XPI build
-- Zotero 9.0.6 visual and behavioral verification on macOS
-- Manifest compatibility declaration for Zotero 7, 8, and 9
-
-## Implementation Boundaries
-
-The current template examples will be replaced with focused arxiv2zh modules,
-localization, preferences, and tests. Existing template/toolkit patterns remain
-the baseline. The reference
-[zotero-pdf2zh](https://github.com/guaguastandup/zotero-pdf2zh) informs menu,
-progress, PDF validation, temporary-file, and attachment-import behavior, but
-arxiv2zh will use its own service adapter and task model.
-
-Both the template and reference project use AGPL-3.0-or-later. Any reused code
-will retain required attribution and license notices.
-
-## Acceptance Criteria
-
-- A selected arXiv Zotero item can be translated from the context menu and
-  receives a valid Chinese PDF child attachment.
-- Multiple selected items run independently and report an accurate summary.
-- A pasted arXiv URL with no selection creates a populated preprint item and
-  attaches the translation.
-- Login survives a Zotero restart without storing a password in plugin data.
-- Existing plugin-owned translations are skipped unless `Download Again` is
-  chosen.
-- Interrupted tasks resume after restart, and terminal history can be removed
-  without deleting Zotero data.
-- The plugin builds and passes its automated checks, and the complete workflow
-  is verified in Zotero 9.0.6.
+- `GET /api/arxivInfo/{id}` 返回 arXiv Atom 元数据和 `hasSrc`。
+- `GET /api/arxivStatus/{id}` 返回任务状态和进度文本。
+- `GET /api/arxivFiles/{id}` 在任务完成后返回 `id`、`title`、`origin`、
+  `zhCN`、`zhCNTar` 和 `isDeepSeek`。
+- 顶层响应状态 `101` 表示需要登录。
+- Web 应用每 10 秒轮询一次，并将 `finished`、`failed`、`error` 和
+  `fault` 视为终止状态。
+- 在已登录的第一方页面中加载 `/arxiv/{id}` 会创建或恢复任务。插件把任务
+  创建交给该页面执行，不自行构造未经确认的提交请求。
+
+这些接口当前可以公开访问，但并非正式文档化的公共 API。因此，所有协议细节
+必须集中在 `HjfyClient` 适配器中。界面、任务、元数据和附件模块只使用规范化
+后的领域对象。
+
+## 架构
+
+### 交互层
+
+- `ContextMenuController` 注册条目与附件右键菜单。
+- `QuickInputDialog` 接收粘贴的 arXiv 地址或 ID。
+- `TaskPanelController` 管理工具栏角标和右侧任务面板。
+- `PreferencesController` 管理精简的偏好设置界面。
+
+### 核心层
+
+- `ArxivResolver` 从直接输入、条目 URL、DOI、Extra 和附件来源字段中提取并
+  规范化 arXiv ID。
+- `TaskManager` 负责去重、批量调度、轮询、持久化、恢复及任务状态转换。
+- `SessionManager` 打开内嵌的 hjfy.top 登录/账户页面，并在用户退出登录时
+  仅清除 hjfy.top 域名相关 Cookie。
+- `MetadataService` 解析 Atom 响应，并在需要时创建 Zotero 预印本条目。
+- `ResultImporter` 负责下载、校验、命名、导入并按设置打开翻译 PDF。
+
+### 边界适配层
+
+- `HjfyClient` 将 hjfy.top 原始响应映射为带类型的结果和错误。
+- `ZoteroAdapter` 封装菜单、窗口、条目、附件、存储及阅读器 API。
+- `TaskStore` 通过原子替换方式将任务记录持久化到
+  `Zotero.DataDirectory.dir/arxiv2zh/tasks.json`。
+
+各模块只暴露职责明确的窄接口，使服务协议变化不会影响 Zotero 条目和界面代码。
+
+## 用户体验
+
+### 操作入口
+
+条目右键菜单包含 `arxiv2zh` 子菜单：
+
+- 翻译为中文
+- 重新下载
+- 在 hjfy.top 查看
+
+工具菜单包含：
+
+- 输入 arXiv 地址
+- 翻译任务
+- 登录/账户
+
+工具栏图标显示进行中任务数量，点击后打开紧凑的右侧任务面板。如果某个受支持
+的 Zotero 版本无法使用工具栏集成，则通过工具菜单打开同一任务面板。
+
+### ID 识别
+
+对于选中的条目，解析器依次检查条目 URL、DOI、Extra 和附件来源元数据。它支持
+`2501.14787v2` 这类新版 ID，也支持 `hep-th/9901001v1` 这类旧版 ID。远端查询
+保留版本号，同时保存不带版本号的基础 ID，用于重复检测和降级查询。
+
+自动识别失败时，快速输入窗口会打开，并保留当前选中条目作为附件目标。
+
+### 任务面板
+
+任务状态包括：
+
+- 等待登录
+- 排队中
+- 翻译中
+- 下载中
+- 导入中
+- 已完成
+- 失败
+- 已停止本地轮询
+
+每行显示 arXiv ID、已知的论文标题、当前详情、耗时，以及符合当前状态的命令：
+打开网站、重试、打开附件、停止本地轮询或移除历史记录。移除历史记录不会删除
+任何 Zotero 条目或附件。
+
+日常工作只显示非模态进度提示；用户需要查看详情时才打开任务面板。单篇任务完成
+后默认打开附件，批量任务完成后只显示汇总，不连续打开多个阅读器。
+
+### 附件与重复处理
+
+存储文件名为 `{normalizedArxivId}_zh_CN.pdf`。中文界面中的 Zotero 附件标题
+为 `中文翻译 - arxiv2zh`，英文界面中为 `Chinese Translation - arxiv2zh`。
+
+重复键由 Zotero 文库、父条目和不带版本号的 arXiv ID 组成。普通翻译操作会跳过
+已有的完整附件。执行“重新下载”时，插件会先获取并校验新 PDF，成功后才替换
+插件自己创建的旧附件；其他翻译附件不会被修改或删除。
+
+### 未选中条目时直接输入地址
+
+插件使用 `DOMParser` 解析 `arxivInfo` 返回的 Atom XML，并创建 Zotero 预印本
+条目。条目写入当前 Zotero 版本支持的标题、作者、摘要、发布日期、arXiv 标识、
+分类和规范地址，然后挂载中文 PDF。插件不额外下载原文 PDF。
+
+存在目标条目时，插件不会覆盖用户编辑过的题录字段。
+
+## 身份验证与会话
+
+当状态响应表明需要登录时，`SessionManager` 在 Zotero 内容浏览器中打开
+`https://hjfy.top/arxiv/{id}`。手机号、微信、验证码及其他身份验证始终停留在
+第一方页面内。Zotero 的 Firefox Cookie 存储会在当前 Zotero 配置中持久保存
+登录会话。
+
+插件不会检查登录表单字段、捕获凭据、记录 Cookie 日志，也不会把 Cookie 序列化
+到插件偏好设置中。账户命令会重新打开第一方页面。“清除会话”在用户明确确认后，
+仅删除 hjfy.top 及其子域名范围内的 Cookie。
+
+登录完成后，第一方页面负责创建或恢复远端任务，插件继续轮询公开状态接口。由
+等待任务触发的登录窗口，在状态不再是“需要登录”后自动关闭；从工具菜单主动打开
+的账户窗口则保持打开，直到用户自行关闭。多个等待中的任务共享同一登录会话，并
+在登录完成后自动继续。
+
+## 任务数据与持久化
+
+每条本地任务记录包含：
+
+- 本地任务 ID 和重复键
+- 带版本号及不带版本号的规范化 arXiv ID
+- 可用时记录文库、目标条目和附件 ID
+- 可用时记录论文标题和来源地址
+- 状态、进度详情、尝试次数和最近一次错误
+- 创建、更新、开始和完成时间
+- 是否为强制重新下载
+
+每次状态转换后写入活动任务。启动时恢复排队中和其他非终止任务。已完成和失败的
+历史记录默认保留 30 天；清理历史不会影响 Zotero 数据。
+
+## 主数据流
+
+1. 识别并规范化 arXiv ID。
+2. 构造重复键，检查本地任务和已有附件。
+3. 查询 `arxivStatus`。
+4. 如果需要登录，打开第一方登录/任务页面，并把本地任务保持为
+   `waiting-login`。
+5. 每 10 秒轮询，直到进入终止状态或达到 30 分钟本地超时。
+6. 任务完成后，在下载前即时请求 `arxivFiles`。
+7. 下载 `zhCN`，校验 PDF，并使用仅含 ASCII 的临时文件名写入临时目录。
+8. 必要时创建元数据条目，并把附件导入 Zotero 存储。
+9. 清理临时文件，持久化完成状态，通知用户；只有符合条件的单篇任务才自动打开
+   阅读器。
+
+## 错误处理
+
+- 网络错误、HTTP 429 和 HTTP 5xx 使用有上限的指数退避重试。
+- 本地任务 30 分钟后超时，但可以恢复或重试，不会盲目重复创建远端任务。
+- 批量任务彼此隔离；单篇失败不会中止其他论文。
+- 不持久化带签名的下载地址；每次下载重试都重新请求 `arxivFiles`。
+- 下载文件必须在前 1 KiB 内包含 `%PDF-`，并在最后 64 KiB 内包含 `%%EOF`，
+  通过后才能导入。
+- 临时文件在 `finally` 代码块中清理。
+- 缺少 LaTeX 源码、翻译失败、编译失败、登录失效、响应结构无效和附件导入失败
+  分别映射为不同的带类型错误，并提供对应恢复操作。
+- 忽略未知响应字段；缺少必要字段时显示服务兼容性错误，不用笼统错误误导用户。
+- 默认服务地址必须使用 HTTPS；仅 localhost 和 `127.0.0.1` 开发地址允许 HTTP。
+
+## 偏好设置
+
+- 服务地址，默认 `https://hjfy.top`
+- 单篇完成后自动打开，默认开启
+- 轮询间隔，默认 10 秒，安全下限为 5 秒
+- 已完成/失败历史保留时间，默认 30 天
+
+登录状态只显示，不作为偏好值保存。账户与 Cookie 控制是命令，不是偏好设置值。
+
+## 测试与调试
+
+### 单元测试
+
+- 新版、带版本号、PDF、alphaXiv 和旧版 arXiv 输入解析
+- 条目字段识别优先级和无效输入
+- 状态转换、去重、批量隔离、超时和重启恢复
+- 原始响应校验及带类型错误映射
+- Atom 元数据解析
+- 附件命名和重复附件所有权规则
+- PDF 文件头和文件尾校验
+
+### 协议与集成测试
+
+- 模拟 `arxivInfo`、`arxivStatus` 和 `arxivFiles` 的成功、需要登录、翻译中、
+  失败、响应畸形和下载地址过期场景。
+- 在 Zotero 内验证启动、右键菜单、工具菜单、偏好设置、任务面板渲染、预印本
+  创建、附件导入、阅读器打开及持久化任务恢复。
+- 使用已完成论文 `2501.14787` 对真实状态查询、签名地址刷新、下载、PDF 校验
+  和附件导入执行在线冒烟测试。
+- 执行一次新任务登录流程。用户在第一方窗口中完成手机号/微信/验证码输入，身份
+  验证完成后继续自动调试。
+
+### 发布前检查
+
+- TypeScript 类型检查
+- Prettier 和 ESLint 检查
+- 单元测试与 Zotero 集成测试
+- 生产 XPI 构建
+- 在 macOS 的 Zotero 9.0.6 中进行视觉与行为验证
+- 清单声明兼容 Zotero 7、8 和 9
+
+## 实现边界
+
+当前模板中的示例功能将替换为聚焦于 arxiv2zh 的模块、本地化、偏好设置和测试。
+实现继续遵循当前模板和 toolkit 的既有模式。参考项目
+[zotero-pdf2zh](https://github.com/guaguastandup/zotero-pdf2zh) 为菜单、进度、
+PDF 校验、临时文件及附件导入提供实践参考；arxiv2zh 使用独立的服务适配器和
+任务模型。
+
+当前模板与参考项目均采用 AGPL-3.0-or-later。任何实际复用的代码都会保留必要
+的署名和许可证声明。
+
+## 验收标准
+
+- 选中包含 arXiv 信息的 Zotero 条目后，可从右键菜单发起翻译，并获得有效的
+  中文 PDF 子附件。
+- 多选条目可以独立运行，并显示准确的批量汇总。
+- 未选中条目时粘贴 arXiv 地址，可创建信息完整的预印本条目并挂载译文。
+- 登录状态可跨 Zotero 重启保留，且插件数据中不保存密码。
+- 已有插件自建译文时默认跳过，只有执行“重新下载”才更新。
+- 中断的任务可在重启后恢复，清除终止任务历史不会删除 Zotero 数据。
+- 插件通过全部自动检查和生产构建，并在 Zotero 9.0.6 中完成全流程验证。
