@@ -1,19 +1,25 @@
 # dot files
 .DS_Store
+.idea/
 
 # Node.js
 node_modules
 pnpm-lock.yaml
 yarn.lock
+coverage/
 
 # TSC
 tsconfig.tsbuildinfo
 
 # Scaffold
 .env
+.env.local
+.env.*.local
 .scaffold
 build
 logs
+*.log
+*.xpi
 
 # Local brainstorming previews
 .superpowers/
