@@ -1,0 +1,11 @@
+arxiv2zh-pref-service-heading = Translation Service
+arxiv2zh-pref-service-url = Service URL
+arxiv2zh-pref-service-note = hjfy.top is used by default. HTTPS is required except for local development addresses.
+arxiv2zh-pref-behavior-heading = Task Behavior
+arxiv2zh-pref-open-after-single = Open the PDF after a single translation completes
+arxiv2zh-pref-poll-interval = Status polling interval (seconds)
+arxiv2zh-pref-history-retention = Keep task history (days)
+arxiv2zh-pref-account-heading = hjfy.top Account
+arxiv2zh-pref-account-note = Sign-in happens on the first-party hjfy.top page. Zotero retains cookies in this profile; arxiv2zh never stores passwords.
+arxiv2zh-pref-open-account = Open Sign In / Account
+arxiv2zh-pref-clear-session = Clear Session

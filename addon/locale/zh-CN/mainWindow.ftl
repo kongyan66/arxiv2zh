@@ -1,0 +1,16 @@
+arxiv2zh-menu-root =
+    .label = arxiv2zh
+arxiv2zh-menu-translate =
+    .label = 翻译为中文
+arxiv2zh-menu-redownload =
+    .label = 重新下载中文 PDF
+arxiv2zh-menu-view-site =
+    .label = 在 hjfy.top 查看
+arxiv2zh-menu-input =
+    .label = 输入 arXiv 地址
+arxiv2zh-menu-tasks =
+    .label = 翻译任务
+arxiv2zh-menu-account =
+    .label = 登录 / 账户
+arxiv2zh-menu-clear-session =
+    .label = 清除 hjfy.top 登录状态

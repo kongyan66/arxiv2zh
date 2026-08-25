@@ -1,0 +1,68 @@
+<linkset>
+  <html:link rel="localization" href="arxiv2zh-preferences.ftl" />
+  <html:link rel="stylesheet" href="chrome://arxiv2zh/content/zoteroPane.css" />
+</linkset>
+<html:div
+  id="arxiv2zh-preferences"
+  class="arxiv2zh-preferences"
+  onload="Zotero.Arxiv2zh.hooks.onPrefsEvent('load', { window })"
+>
+  <html:section>
+    <html:h2 data-l10n-id="arxiv2zh-pref-service-heading"></html:h2>
+    <html:label
+      for="arxiv2zh-service-url"
+      data-l10n-id="arxiv2zh-pref-service-url"
+    ></html:label>
+    <html:input id="arxiv2zh-service-url" type="url" spellcheck="false" />
+    <html:p
+      class="arxiv2zh-pref-note"
+      data-l10n-id="arxiv2zh-pref-service-note"
+    ></html:p>
+  </html:section>
+  <html:section>
+    <html:h2 data-l10n-id="arxiv2zh-pref-behavior-heading"></html:h2>
+    <html:label class="arxiv2zh-pref-check">
+      <html:input id="arxiv2zh-open-after-single" type="checkbox" />
+      <html:span data-l10n-id="arxiv2zh-pref-open-after-single"></html:span>
+    </html:label>
+    <html:div class="arxiv2zh-pref-field-row">
+      <html:label
+        for="arxiv2zh-poll-interval"
+        data-l10n-id="arxiv2zh-pref-poll-interval"
+      ></html:label>
+      <html:input id="arxiv2zh-poll-interval" type="number" min="5" step="1" />
+    </html:div>
+    <html:div class="arxiv2zh-pref-field-row">
+      <html:label
+        for="arxiv2zh-history-retention"
+        data-l10n-id="arxiv2zh-pref-history-retention"
+      ></html:label>
+      <html:input
+        id="arxiv2zh-history-retention"
+        type="number"
+        min="1"
+        step="1"
+      />
+    </html:div>
+  </html:section>
+  <html:section>
+    <html:h2 data-l10n-id="arxiv2zh-pref-account-heading"></html:h2>
+    <html:p
+      class="arxiv2zh-pref-note"
+      data-l10n-id="arxiv2zh-pref-account-note"
+    ></html:p>
+    <html:div class="arxiv2zh-pref-actions">
+      <html:button
+        id="arxiv2zh-open-account"
+        type="button"
+        data-l10n-id="arxiv2zh-pref-open-account"
+      ></html:button>
+      <html:button
+        id="arxiv2zh-clear-session"
+        type="button"
+        class="secondary"
+        data-l10n-id="arxiv2zh-pref-clear-session"
+      ></html:button>
+    </html:div>
+  </html:section>
+</html:div>

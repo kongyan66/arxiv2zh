@@ -1,0 +1,16 @@
+arxiv2zh-menu-root =
+    .label = arxiv2zh
+arxiv2zh-menu-translate =
+    .label = Translate to Chinese
+arxiv2zh-menu-redownload =
+    .label = Re-download Chinese PDF
+arxiv2zh-menu-view-site =
+    .label = View on hjfy.top
+arxiv2zh-menu-input =
+    .label = Enter arXiv URL
+arxiv2zh-menu-tasks =
+    .label = Translation Tasks
+arxiv2zh-menu-account =
+    .label = Sign In / Account
+arxiv2zh-menu-clear-session =
+    .label = Clear hjfy.top Session
