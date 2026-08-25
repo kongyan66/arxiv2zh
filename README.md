@@ -163,6 +163,7 @@ XPI、更新清单并创建 Release。
 
 - [Zotero](https://www.zotero.org/) 提供文献管理平台和插件接口。
 - [hjfy.top](https://hjfy.top/) 提供论文翻译服务。
+- 本项目认可并感谢 [LINUX DO](https://linux.do/) 开源社区提供交流与反馈平台。
 - 项目基于
   [zotero-plugin-template](https://github.com/windingwind/zotero-plugin-template)
   和 Zotero 原生插件 API 构建。
