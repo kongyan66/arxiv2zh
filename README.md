@@ -12,6 +12,9 @@
   <a href="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml"><img src="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/v/release/kongyan66/arxiv2zh" alt="GitHub Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/kongyan66/arxiv2zh" alt="AGPL-3.0-or-later"></a>
+  <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-7-CC2936?logo=zotero&amp;logoColor=white" alt="Zotero 7"></a>
+  <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-8-E76F2E?logo=zotero&amp;logoColor=white" alt="Zotero 8"></a>
+  <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-9-F2C94C?logo=zotero&amp;logoColor=white" alt="Zotero 9"></a>
 </p>
 
 <p align="center"><a href="README.en-US.md">English</a></p>
