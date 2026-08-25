@@ -185,6 +185,8 @@ GitHub Actions builds the XPI and update manifests and creates the release.
 - [Zotero](https://www.zotero.org/) provides the reference manager and plugin
   APIs.
 - [hjfy.top](https://hjfy.top/) provides the translation service.
+- This project recognizes and thanks the [LINUX DO](https://linux.do/) open-source
+  community for discussion and feedback.
 - The project is built from
   [zotero-plugin-template](https://github.com/windingwind/zotero-plugin-template)
   and Zotero's native plugin APIs.
