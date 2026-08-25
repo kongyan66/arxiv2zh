@@ -5,12 +5,12 @@
 ## 概述
 
 本次工作将现有 arxiv2zh 0.1.2 整理为可发布到
-`github.com/kongcaihua/arxiv2zh` 的标准社区开源项目。整理工作保持插件行为不变，
+`github.com/kongyan66/arxiv2zh` 的标准社区开源项目。整理工作保持插件行为不变，
 重点处理永久项目标识、仓库卫生、用户与贡献者文档、隐私和免责声明、自动检查及
 GitHub Release 流程。
 
 项目继续采用 `AGPL-3.0-or-later` 许可证。插件永久 ID 使用
-`arxiv2zh@kongcaihua`，发布后不再更改。
+`arxiv2zh@kongyan66`，发布后不再更改。
 
 ## 目标
 
@@ -45,9 +45,9 @@ GitHub Release 流程。
 
 ## 项目标识与版本
 
-- GitHub 仓库：`kongcaihua/arxiv2zh`
+- GitHub 仓库：`kongyan66/arxiv2zh`
 - npm 包名：`arxiv2zh`
-- Zotero 插件 ID：`arxiv2zh@kongcaihua`
+- Zotero 插件 ID：`arxiv2zh@kongyan66`
 - 首个公开整理版本：`0.1.2`
 - Git 标签：`v0.1.2`
 - 版本规范：语义化版本
