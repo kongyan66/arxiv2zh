@@ -3,19 +3,29 @@ name: Release
 on:
   push:
     tags:
-      - v**
+      - v*
 
 permissions:
   contents: write
-  issues: write
-  pull-requests: write
 
 jobs:
-  create-release:
-    uses: zotero-plugin-dev/workflows/.github/workflows/release-plugin.yml@main
-    # You can customize any of the inputs here.
-    # If you omit an input, its default value will be used.
-    with:
-      build: "npm run build"
-      release: "npm run release"
-    secrets: inherit
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build production XPI
+        run: npm run build
+      - name: Create GitHub release
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

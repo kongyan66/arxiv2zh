@@ -8,37 +8,32 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
-  lint:
+  verify:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GitHub_TOKEN }}
     steps:
-      - name: Setup JS
-        uses: zotero-plugin-dev/workflows/setup-js@main
-      - name: Run Lint
-        run: npm run lint:check
-
-  build:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GitHub_TOKEN }}
-    steps:
-      - name: Setup JS
-        uses: zotero-plugin-dev/workflows/setup-js@main
-      - name: Run Build
-        run: npm run build
-      - name: Upload build result
-        uses: actions/upload-artifact@v4
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          name: build-result
-          path: .scaffold/build
-
-  test:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Setup JS
-        uses: zotero-plugin-dev/workflows/setup-js@main
-      - run: npm run test
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run checks
+        run: npm run check
+      - name: Build production XPI
+        run: npm run build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: arxiv2zh-${{ github.sha }}
+          path: |
+            .scaffold/build/arxiv2zh.xpi
+            .scaffold/build/update*.json
+          if-no-files-found: error
+          retention-days: 14

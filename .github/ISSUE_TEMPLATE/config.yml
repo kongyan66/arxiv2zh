@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/kongyan66/arxiv2zh/security/advisories/new
+    about: Report vulnerabilities privately instead of opening a public issue.
+  - name: hjfy.top service
+    url: https://hjfy.top/
+    about: Check the third-party service when translation is unavailable outside Zotero.

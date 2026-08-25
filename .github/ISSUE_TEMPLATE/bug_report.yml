@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible problem in arxiv2zh
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Remove cookies, account details, signed
+        download URLs, and private filesystem paths before submitting.
+  - type: input
+    id: zotero-version
+    attributes:
+      label: Zotero version
+      placeholder: "For example: 9.0.6"
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: arxiv2zh version
+      placeholder: "For example: 0.1.2"
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      placeholder: "For example: macOS 15.6, Windows 11, Ubuntu 24.04"
+    validations:
+      required: true
+  - type: input
+    id: arxiv-id
+    attributes:
+      label: arXiv ID
+      description: Provide the public arXiv ID when it is relevant.
+      placeholder: "For example: 2501.14787"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Describe the smallest sequence that consistently shows the problem.
+      placeholder: |
+        1. Select ...
+        2. Choose ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and sanitized error
+      description: Do not include credentials, cookies, signed URLs, or private paths.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I reproduced this with the latest arxiv2zh release.
+          required: true
+        - label: I confirmed that hjfy.top itself is reachable when the issue involves the service.
+          required: true
+        - label: I removed credentials, cookies, signed URLs, and private data.
+          required: true
