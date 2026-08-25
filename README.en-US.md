@@ -51,10 +51,6 @@ Chinese PDF, and attaches it to the corresponding Zotero item.
 3. Open the gear menu, choose **Install Plugin From File**, and select the XPI.
 4. Restart Zotero.
 
-If you previously installed a development build whose plugin ID is
-`arxiv2zh@kongcaihua.local`, uninstall it before installing the public release so
-Zotero does not load two plugin instances.
-
 Install a newer XPI over the existing version to upgrade while retaining local
 preferences and task history.
 
