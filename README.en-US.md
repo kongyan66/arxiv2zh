@@ -5,7 +5,7 @@
 <h1 align="center">arxiv2zh</h1>
 
 <p align="center">
-  Submit arXiv translations from Zotero and attach the translated Chinese PDF.
+  Translate arXiv papers in Zotero with minimal setup and automatically archive well-formatted Chinese PDFs.
 </p>
 
 <p align="center">
@@ -19,9 +19,14 @@
 
 <p align="center"><a href="README.md">简体中文</a></p>
 
-arxiv2zh is a community plugin for Zotero 7-9. It asks
-[hjfy.top](https://hjfy.top/) to process an arXiv paper, validates the translated
-Chinese PDF, and attaches it to the corresponding Zotero item.
+arxiv2zh is a lightweight arXiv translation plugin for Zotero 7-9. No API key
+or local translation environment is required: install the plugin, sign in to
+[hjfy.top](https://hjfy.top/), and submit translation tasks directly from
+Zotero. The service uses large language models and translates from the TeX
+source provided by arXiv before recompiling the paper. This preserves formulas,
+figures, citations, and document structure as faithfully as possible, produces
+a well-formatted Chinese PDF, and automatically attaches it to the corresponding
+Zotero item.
 
 > [!IMPORTANT]
 > arxiv2zh is an independent community project. It is not affiliated with or

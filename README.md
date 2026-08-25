@@ -5,7 +5,7 @@
 <h1 align="center">arxiv2zh</h1>
 
 <p align="center">
-  在 Zotero 中提交 arXiv 论文翻译，并自动归档中文 PDF。
+  简单配置，即可在 Zotero 中翻译 arXiv 论文，并自动归档排版完整的中文 PDF。
 </p>
 
 <p align="center">
@@ -19,9 +19,11 @@
 
 <p align="center"><a href="README.en-US.md">English</a></p>
 
-arxiv2zh 是一个面向 Zotero 7-9 的社区插件。它调用
-[hjfy.top](https://hjfy.top/) 处理 arXiv 论文，在翻译完成后校验中文 PDF 并将其
-作为附件添加到 Zotero 条目。
+arxiv2zh 是一款面向 Zotero 7-9 的轻量级 arXiv 论文翻译插件。无需配置 API
+Key，也无需部署本地翻译环境；安装插件并登录 [hjfy.top](https://hjfy.top/)
+后，即可在 Zotero 中提交翻译任务。翻译服务基于大语言模型，使用 arXiv 提供的
+TeX 源码进行翻译与重新编译，在尽可能保留公式、图表、引用和论文结构的同时，
+生成高质量排版的中文 PDF，并自动归档到对应的 Zotero 条目。
 
 > [!IMPORTANT]
 > arxiv2zh 是独立社区项目，与 Zotero、arXiv 和 hjfy.top 均无隶属或官方认可
