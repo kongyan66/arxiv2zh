@@ -1,3 +1,245 @@
-.makeItRed {
-  background-color: tomato;
+:root {
+  --arxiv2zh-accent: #16835d;
+  --arxiv2zh-border: color-mix(in srgb, currentColor 18%, transparent);
+  --arxiv2zh-muted: color-mix(in srgb, currentColor 62%, transparent);
+  --arxiv2zh-surface: Canvas;
+  --arxiv2zh-surface-soft: color-mix(in srgb, Canvas 94%, CanvasText 6%);
+}
+
+.arxiv2zh-toolbar-button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin-inline: 2px;
+  border: 0;
+  border-radius: 4px;
+  color: CanvasText;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.arxiv2zh-toolbar-button:hover,
+.arxiv2zh-icon-button:hover {
+  background: color-mix(in srgb, CanvasText 9%, transparent);
+}
+
+.arxiv2zh-toolbar-mark {
+  color: var(--arxiv2zh-accent);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.arxiv2zh-task-badge {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: -3px;
+  min-width: 14px;
+  height: 14px;
+  padding-inline: 3px;
+  border-radius: 7px;
+  color: white;
+  background: #b33a32;
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+}
+
+.arxiv2zh-task-panel {
+  position: fixed;
+  z-index: 2147483000;
+  inset-block: 48px 18px;
+  inset-inline-end: 18px;
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - 36px));
+  border: 1px solid var(--arxiv2zh-border);
+  border-radius: 6px;
+  color: CanvasText;
+  background: var(--arxiv2zh-surface);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+  font: menu;
+}
+
+.arxiv2zh-task-panel[hidden] {
+  display: none;
+}
+
+.arxiv2zh-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-height: 52px;
+  padding: 8px 12px 8px 16px;
+  border-bottom: 1px solid var(--arxiv2zh-border);
+}
+
+.arxiv2zh-panel-header > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.arxiv2zh-panel-header strong {
+  color: var(--arxiv2zh-accent);
+  font-size: 16px;
+}
+
+.arxiv2zh-panel-header span,
+.arxiv2zh-task-detail {
+  color: var(--arxiv2zh-muted);
+}
+
+.arxiv2zh-icon-button {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--arxiv2zh-border);
+  border-radius: 4px;
+  color: inherit;
+  background: var(--arxiv2zh-surface-soft);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.arxiv2zh-task-list {
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+}
+
+.arxiv2zh-task {
+  padding: 12px;
+  border: 1px solid var(--arxiv2zh-border);
+  border-radius: 6px;
+  background: var(--arxiv2zh-surface);
+}
+
+.arxiv2zh-task + .arxiv2zh-task {
+  margin-top: 8px;
+}
+
+.arxiv2zh-task-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.arxiv2zh-task-heading span {
+  flex: none;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--arxiv2zh-accent);
+  background: color-mix(in srgb, var(--arxiv2zh-accent) 12%, transparent);
+  font-size: 11px;
+}
+
+.arxiv2zh-status-failed .arxiv2zh-task-heading span {
+  color: #a52d26;
+  background: color-mix(in srgb, #b33a32 12%, transparent);
+}
+
+.arxiv2zh-task-title {
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.arxiv2zh-task-detail {
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.arxiv2zh-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.arxiv2zh-task-actions button,
+.arxiv2zh-pref-actions button {
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--arxiv2zh-border);
+  border-radius: 4px;
+  color: CanvasText;
+  background: var(--arxiv2zh-surface-soft);
+  font: inherit;
+  cursor: pointer;
+}
+
+.arxiv2zh-task-actions button:hover,
+.arxiv2zh-pref-actions button:hover {
+  border-color: var(--arxiv2zh-accent);
+}
+
+.arxiv2zh-empty {
+  padding: 52px 16px;
+  color: var(--arxiv2zh-muted);
+  text-align: center;
+}
+
+.arxiv2zh-preferences {
+  max-width: 680px;
+  color: CanvasText;
+  font: menu;
+}
+
+.arxiv2zh-preferences section {
+  padding-block: 4px 20px;
+  border-bottom: 1px solid var(--arxiv2zh-border);
+}
+
+.arxiv2zh-preferences h2 {
+  margin: 14px 0 12px;
+  font-size: 15px;
+}
+
+.arxiv2zh-preferences input[type="url"] {
+  display: block;
+  box-sizing: border-box;
+  width: min(520px, 100%);
+  margin-top: 6px;
+}
+
+.arxiv2zh-pref-note {
+  max-width: 580px;
+  margin: 6px 0 0;
+  color: var(--arxiv2zh-muted);
+  line-height: 1.45;
+}
+
+.arxiv2zh-pref-check,
+.arxiv2zh-pref-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+}
+
+.arxiv2zh-pref-field-row {
+  justify-content: space-between;
+  max-width: 420px;
+}
+
+.arxiv2zh-pref-field-row input {
+  width: 88px;
+}
+
+.arxiv2zh-pref-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
 }

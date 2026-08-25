@@ -1,5 +1,11 @@
-pref-title = 插件模板设置示例
-pref-enable =
-    .label = 开启
-pref-input = 输入
-pref-help = { $name } Build { $version } { $time }
+arxiv2zh-pref-service-heading = 翻译服务
+arxiv2zh-pref-service-url = 服务地址
+arxiv2zh-pref-service-note = 默认使用 hjfy.top。除本机开发地址外，服务地址必须使用 HTTPS。
+arxiv2zh-pref-behavior-heading = 任务行为
+arxiv2zh-pref-open-after-single = 单篇翻译完成后自动打开 PDF
+arxiv2zh-pref-poll-interval = 状态轮询间隔（秒）
+arxiv2zh-pref-history-retention = 任务历史保留（天）
+arxiv2zh-pref-account-heading = hjfy.top 账户
+arxiv2zh-pref-account-note = 登录在 hjfy.top 第一方页面中完成。Zotero 会在当前配置中保留 Cookie；arxiv2zh 不保存密码。
+arxiv2zh-pref-open-account = 打开登录 / 账户
+arxiv2zh-pref-clear-session = 清除登录状态

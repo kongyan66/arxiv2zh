@@ -1,36 +1,48 @@
 {
-  "name": "zotero-plugin-template",
+  "name": "arxiv2zh",
   "type": "module",
-  "version": "3.1.0",
-  "description": "Zotero Plugin Template",
+  "version": "0.1.2",
+  "description": "Translate arXiv papers with hjfy.top and attach Chinese PDFs in Zotero.",
+  "private": true,
+  "keywords": [
+    "zotero",
+    "zotero-plugin",
+    "arxiv",
+    "pdf",
+    "translation"
+  ],
   "config": {
-    "addonName": "Zotero Plugin Template",
-    "addonID": "addontemplate@euclpts.com",
-    "addonRef": "addontemplate",
-    "addonInstance": "AddonTemplate",
-    "prefsPrefix": "extensions.zotero.addontemplate"
+    "addonName": "arxiv2zh",
+    "addonID": "arxiv2zh@kongyan66",
+    "addonRef": "arxiv2zh",
+    "addonInstance": "Arxiv2zh",
+    "prefsPrefix": "extensions.zotero.arxiv2zh"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windingwind/zotero-plugin-template.git"
+    "url": "git+https://github.com/kongyan66/arxiv2zh.git"
   },
-  "author": "windingwind",
+  "author": "kongyan66",
   "bugs": {
-    "url": "https://github.com/windingwind/zotero-plugin-template/issues"
+    "url": "https://github.com/kongyan66/arxiv2zh/issues"
   },
-  "homepage": "https://github.com/windingwind/zotero-plugin-template#readme",
+  "homepage": "https://github.com/kongyan66/arxiv2zh#readme",
   "license": "AGPL-3.0-or-later",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "zotero-plugin serve",
     "build": "zotero-plugin build && tsc --noEmit",
+    "check": "npm run lint:check && npm run typecheck && npm run test",
     "lint:check": "prettier --check . && eslint .",
     "lint:fix": "prettier --write . && eslint . --fix",
     "release": "zotero-plugin release",
-    "test": "zotero-plugin test",
+    "test": "npm run test:unit",
+    "test:integration": "zotero-plugin test --no-watch",
+    "test:unit": "node --experimental-strip-types --test test/unit/*.test.mts",
+    "typecheck": "tsc --noEmit",
     "update-deps": "npm update --save"
-  },
-  "dependencies": {
-    "zotero-plugin-toolkit": "^5.1.0-beta.13"
   },
   "devDependencies": {
     "@types/chai": "^5.2.3",

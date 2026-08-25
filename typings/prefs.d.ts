@@ -7,8 +7,10 @@
 declare namespace _ZoteroTypes {
   interface Prefs {
     PluginPrefsMap: {
-      "enable": boolean;
-      "input": string;
+      "serviceURL": string;
+      "openAfterSingle": boolean;
+      "pollInterval": number;
+      "historyRetentionDays": number;
     };
   }
 }
