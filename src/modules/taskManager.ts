@@ -204,7 +204,7 @@ export class TaskManager {
     if (!identifier) throw new Error(`无效的 arXiv ID: ${task.arxivId}`);
     const client = this.options.getClient();
 
-    const info = await client.getInfo(identifier);
+    const info = await this.getInfoWithFallback(client, identifier);
     if (!info.hasSource) throw new Error("这篇论文没有可供翻译的 LaTeX 源码");
     const metadata = parseArxivAtom(info.atomXML);
     task =
@@ -294,6 +294,22 @@ export class TaskManager {
       attachmentID: attachment.id,
       title: files.title || task.title,
     });
+  }
+
+  private async getInfoWithFallback(
+    client: HjfyClient,
+    identifier: ArxivIdentifier,
+  ) {
+    try {
+      return await client.getInfo(identifier);
+    } catch (error) {
+      if (!(error instanceof HjfyError)) throw error;
+      debugLog(`hjfy arxivInfo 失败，改用 arXiv 元数据接口 (${error.code})`);
+      return {
+        atomXML: await client.getArxivAtom(identifier),
+        hasSource: true,
+      };
+    }
   }
 
   private pollIntervalMilliseconds(): number {

@@ -37,6 +37,7 @@ export interface HjfyFiles {
 }
 
 export interface HjfyTransport {
+  getText(url: string): Promise<string>;
   getJSON(url: string): Promise<unknown>;
   getBytes(url: string): Promise<Uint8Array>;
 }
@@ -116,6 +117,14 @@ function requiredString(
   return value;
 }
 
+function endpointLabel(url: string): string {
+  try {
+    return new URL(url).pathname.split("/").filter(Boolean).pop() || "请求";
+  } catch {
+    return "请求";
+  }
+}
+
 export class HjfyClient {
   readonly baseURL: string;
   private readonly transport: HjfyTransport;
@@ -127,6 +136,17 @@ export class HjfyClient {
 
   private endpoint(path: string): string {
     return `${this.baseURL}${path}`;
+  }
+
+  async getArxivAtom(identifier: ArxivIdentifier): Promise<string> {
+    const url = new URL("https://export.arxiv.org/api/query");
+    url.searchParams.set("id_list", identifier.id);
+    url.searchParams.set("max_results", "1");
+    const atomXML = await this.transport.getText(url.toString());
+    if (!atomXML.trim()) {
+      throw new HjfyError("invalid-response", "arXiv 未返回论文元数据");
+    }
+    return atomXML;
   }
 
   async getInfo(identifier: ArxivIdentifier): Promise<HjfyInfo> {
@@ -220,14 +240,40 @@ export class HjfyClient {
 }
 
 export function createZoteroTransport(): HjfyTransport {
-  return {
-    async getJSON(url) {
-      const xhr = await Zotero.HTTP.request("GET", url, {
-        responseType: "text",
-        timeout: 30_000,
+  async function request(
+    url: string,
+    responseType: "text" | "arraybuffer",
+    timeout: number,
+    code: HjfyErrorCode,
+  ) {
+    try {
+      return await Zotero.HTTP.request("GET", url, {
+        responseType,
+        timeout,
         errorDelayIntervals: [1_000, 2_000, 5_000],
         errorDelayMax: 10_000,
       });
+    } catch (error) {
+      const statusMatch =
+        error instanceof Error
+          ? error.message.match(/status code (\d+)/i)
+          : null;
+      const detail = statusMatch
+        ? `HTTP ${statusMatch[1]}`
+        : error instanceof Error && /timed? out|timeout/i.test(error.message)
+          ? "请求超时"
+          : "网络请求失败";
+      throw new HjfyError(code, `${endpointLabel(url)} ${detail}`);
+    }
+  }
+
+  return {
+    async getText(url) {
+      const xhr = await request(url, "text", 30_000, "remote-error");
+      return xhr.responseText || "";
+    },
+    async getJSON(url) {
+      const xhr = await request(url, "text", 30_000, "remote-error");
       try {
         return JSON.parse(xhr.responseText || "");
       } catch {
@@ -235,12 +281,7 @@ export function createZoteroTransport(): HjfyTransport {
       }
     },
     async getBytes(url) {
-      const xhr = await Zotero.HTTP.request("GET", url, {
-        responseType: "arraybuffer",
-        timeout: 60_000,
-        errorDelayIntervals: [1_000, 2_000, 5_000],
-        errorDelayMax: 10_000,
-      });
+      const xhr = await request(url, "arraybuffer", 60_000, "download-failed");
       const response = xhr.response as unknown;
       if (!response || typeof response !== "object") {
         throw new HjfyError("download-failed", "服务未返回二进制 PDF");
