@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="description"
+      content="arxiv2zh 快速上手：在 Zotero 中翻译 arXiv 论文并自动归档中文 PDF。"
+    />
+    <title>arxiv2zh · Zotero arXiv 中文翻译快速上手</title>
+    <link rel="stylesheet" href="assets/tutorial.css" />
+    <script src="assets/tutorial.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="site-header">
+      <nav class="nav-shell" aria-label="主导航">
+        <a class="brand" href="#overview" aria-label="arxiv2zh 首页"
+          >arxiv2zh</a
+        >
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-menu"
+        >
+          <span class="sr-only">打开导航</span>
+        </button>
+        <div class="site-menu" id="site-menu">
+          <a href="#install">安装</a>
+          <a href="#translate">翻译</a>
+          <a
+            href="https://github.com/kongyan66/arxiv2zh"
+            target="_blank"
+            rel="noreferrer"
+            >GitHub</a
+          >
+        </div>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero" id="overview">
+        <div class="hero-copy">
+          <p class="eyebrow">Zotero × arXiv</p>
+          <h1>arxiv2zh</h1>
+          <p class="hero-lede">
+            简单配置，即可在 Zotero 中翻译 arXiv 论文，并自动归档排版完整的中文
+            PDF。
+          </p>
+          <div class="hero-actions">
+            <a
+              class="button button-primary"
+              href="https://github.com/kongyan66/arxiv2zh/releases/latest"
+              >下载插件</a
+            >
+            <a
+              class="button button-secondary"
+              href="https://github.com/kongyan66/arxiv2zh"
+              >查看源码</a
+            >
+          </div>
+        </div>
+        <figure class="product-shot">
+          <img
+            src="assets/images/tutorial-result.webp"
+            alt="arxiv2zh 在 Zotero 中显示完成的中文 PDF 附件"
+            width="1600"
+            height="1000"
+          />
+        </figure>
+      </section>
+      <section class="step" id="install">
+        <div class="step-copy">
+          <p class="step-number">01</p>
+          <h2>安装插件</h2>
+          <p>
+            从 GitHub Release 下载 <code>arxiv2zh.xpi</code>，在 Zotero 的“工具
+            → 插件”中选择“从文件安装插件”，随后重启 Zotero。
+          </p>
+        </div>
+        <figure>
+          <img
+            src="assets/images/tutorial-install.webp"
+            alt="在 Zotero 插件管理器中从文件安装 arxiv2zh"
+            width="1600"
+            height="1000"
+          />
+        </figure>
+      </section>
+      <section class="step step-reverse" id="login">
+        <div class="step-copy">
+          <p class="step-number">02</p>
+          <h2>登录一次</h2>
+          <p>
+            从 arxiv2zh 设置或任务面板打开 hjfy.top 并完成登录。Cookie
+            保存在当前 Zotero 配置中，无需每次重复登录。
+          </p>
+        </div>
+        <figure>
+          <img
+            src="assets/images/tutorial-login.webp"
+            alt="从 arxiv2zh 打开 hjfy.top 登录入口"
+            width="1600"
+            height="1000"
+          />
+        </figure>
+      </section>
+      <section class="step" id="translate">
+        <div class="step-copy">
+          <p class="step-number">03</p>
+          <h2>翻译为中文</h2>
+          <p>
+            选中包含 arXiv 信息的条目或 PDF 附件，右键选择“arxiv2zh →
+            翻译为中文”。
+          </p>
+        </div>
+        <figure>
+          <img
+            src="assets/images/tutorial-translate.webp"
+            alt="在 Zotero 条目右键菜单中选择翻译为中文"
+            width="1600"
+            height="1000"
+          />
+        </figure>
+      </section>
+      <section class="result" id="result">
+        <div>
+          <p class="eyebrow">完成</p>
+          <h2>中文 PDF 自动回到 Zotero</h2>
+          <p>
+            翻译服务使用 arXiv 的 TeX
+            源码翻译并重新编译，尽可能保留公式、图表、引用与论文结构。完成后，中文
+            PDF 自动成为原条目的子附件。
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p>兼容 Zotero 7–9 · arxiv2zh 是独立社区项目，hjfy.top 为第三方服务。</p>
+      <nav aria-label="页尾导航">
+        <a href="https://github.com/kongyan66/arxiv2zh/blob/main/PRIVACY.md"
+          >隐私说明</a
+        >
+        <a href="https://github.com/kongyan66/arxiv2zh/issues">问题反馈</a>
+      </nav>
+    </footer>
+  </body>
+</html>
