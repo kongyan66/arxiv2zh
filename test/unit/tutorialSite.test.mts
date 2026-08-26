@@ -3,6 +3,18 @@ import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const tutorialUrl = new URL("../../docs/tutorial.html", import.meta.url);
+const indexUrl = new URL("../../docs/index.html", import.meta.url);
+const behaviorUrl = new URL("../../docs/assets/tutorial.js", import.meta.url);
+const stylesUrl = new URL("../../docs/assets/tutorial.css", import.meta.url);
+const readmeUrl = new URL("../../README.md", import.meta.url);
+const englishReadmeUrl = new URL("../../README.en-US.md", import.meta.url);
+const pagesWorkflowUrl = new URL(
+  "../../.github/workflows/pages.yml",
+  import.meta.url,
+);
+const repositoryUrl = "https://github.com/kongyan66/arxiv2zh";
+const releaseUrl = `${repositoryUrl}/releases/latest`;
+const tutorialPageUrl = "https://kongyan66.github.io/arxiv2zh/tutorial.html";
 const expectedImageSources = [
   "assets/images/tutorial-install.webp",
   "assets/images/tutorial-login.webp",
@@ -84,11 +96,59 @@ function localAssetUrls(references: readonly string[]): URL[] {
     .filter((url) => url.protocol === "file:");
 }
 
+function descendantMarkup(html: string, parent: OpeningTag): string {
+  const closingTag = new RegExp(`</${parent.name}\\s*>`, "i").exec(
+    html.slice(parent.end),
+  );
+  assert.ok(closingTag, `missing closing <${parent.name}> tag`);
+  return html.slice(parent.end, parent.end + closingTag.index);
+}
+
+function descendantTags(html: string, parent: OpeningTag): OpeningTag[] {
+  return openingTags(descendantMarkup(html, parent));
+}
+
+function hrefsWithin(html: string, parent: OpeningTag): string[] {
+  return descendantTags(html, parent)
+    .filter((tag) => tag.name === "a")
+    .map((tag) => requiredAttribute(tag, "href"));
+}
+
+test("root page redirects to the canonical tutorial with a fallback link", async () => {
+  const html = await readFile(indexUrl, "utf8");
+  const tags = openingTags(html);
+  const refresh = tags.find(
+    (tag) =>
+      tag.name === "meta" &&
+      tag.attributes.get("http-equiv")?.toLowerCase() === "refresh",
+  );
+  const canonical = tags.find(
+    (tag) =>
+      tag.name === "link" &&
+      tag.attributes.get("rel")?.toLowerCase() === "canonical",
+  );
+  const fallbackLinks = tags
+    .filter((tag) => tag.name === "a")
+    .map((tag) => requiredAttribute(tag, "href"));
+
+  assert.ok(refresh, "root page requires a meta refresh");
+  assert.match(
+    requiredAttribute(refresh, "content"),
+    /url=\.\/tutorial\.html/i,
+  );
+  assert.ok(canonical, "root page requires a canonical URL");
+  assert.equal(requiredAttribute(canonical, "href"), tutorialPageUrl);
+  assert.ok(fallbackLinks.includes("./tutorial.html"));
+});
+
 test("tutorial page exposes the quickstart sections and destinations", async () => {
   const html = await readFile(tutorialUrl, "utf8");
   const tags = openingTags(html);
   const ids = new Set(tags.flatMap((tag) => tag.attributes.get("id") ?? []));
   const hrefs = tags.flatMap((tag) => tag.attributes.get("href") ?? []);
+  const hero = tags.find(
+    (tag) => tag.name === "section" && tag.attributes.get("id") === "overview",
+  );
 
   for (const id of ["overview", "install", "login", "translate", "result"]) {
     assert.ok(ids.has(id), `missing #${id}`);
@@ -102,11 +162,55 @@ test("tutorial page exposes the quickstart sections and destinations", async () 
     html.slice(heading.end, heading.end + closingHeading.index).trim(),
     "arxiv2zh",
   );
-  assert.ok(
-    hrefs.includes("https://github.com/kongyan66/arxiv2zh/releases/latest"),
+  assert.ok(hrefs.includes(releaseUrl));
+  assert.ok(hrefs.includes(repositoryUrl));
+  assert.ok(hero, "missing hero section");
+  const heroText = descendantMarkup(html, hero)
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ");
+  assert.match(heroText, /第三方服务\s+hjfy\.top/);
+  assert.match(heroText, /登录与服务可用性/);
+});
+
+test("top and footer navigation expose the expected destinations", async () => {
+  const html = await readFile(tutorialUrl, "utf8");
+  const tags = openingTags(html);
+  const topNavigation = tags.find(
+    (tag) =>
+      tag.name === "nav" && tag.attributes.get("aria-label") === "主导航",
   );
-  assert.ok(hrefs.includes("https://github.com/kongyan66/arxiv2zh"));
-  assert.ok(html.includes("hjfy.top"));
+  const footerNavigation = tags.find(
+    (tag) =>
+      tag.name === "nav" && tag.attributes.get("aria-label") === "页尾导航",
+  );
+
+  assert.ok(topNavigation, "missing top navigation");
+  assert.ok(footerNavigation, "missing footer navigation");
+
+  const topHrefs = hrefsWithin(html, topNavigation);
+  const footerHrefs = hrefsWithin(html, footerNavigation);
+  for (const destination of [
+    "#install",
+    "#translate",
+    releaseUrl,
+    repositoryUrl,
+  ]) {
+    assert.ok(
+      topHrefs.includes(destination),
+      `top nav is missing ${destination}`,
+    );
+  }
+  for (const destination of [
+    `${repositoryUrl}#readme`,
+    repositoryUrl,
+    `${repositoryUrl}/blob/main/PRIVACY.md`,
+    `${repositoryUrl}/issues`,
+  ]) {
+    assert.ok(
+      footerHrefs.includes(destination),
+      `footer nav is missing ${destination}`,
+    );
+  }
 });
 
 test("tutorial page uses four accessible, dimensioned local images", async () => {
@@ -154,4 +258,52 @@ test("tutorial references existing local styles, behavior, and screenshots", asy
     ...scriptReferences,
   ]);
   await Promise.all(assetUrls.map((url) => access(url)));
+});
+
+test("navigation progressively enhances and remains usable without JavaScript", async () => {
+  const [html, behavior, styles] = await Promise.all([
+    readFile(tutorialUrl, "utf8"),
+    readFile(behaviorUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+  ]);
+  const tags = openingTags(html);
+  const root = tags.find((tag) => tag.name === "html");
+  const toggle = tags.find(
+    (tag) => tag.name === "button" && tag.attributes.has("aria-controls"),
+  );
+  const inlineScript = /<script>([\s\S]*?)<\/script>/i.exec(html)?.[1] ?? "";
+
+  assert.ok(root?.attributes.get("class")?.split(/\s+/).includes("no-js"));
+  assert.equal(toggle?.attributes.get("aria-controls"), "site-menu");
+  assert.equal(toggle?.attributes.get("aria-expanded"), "false");
+  assert.match(
+    inlineScript,
+    /classList\.replace\(\s*["']no-js["']\s*,\s*["']js["']\s*\)/,
+  );
+
+  assert.match(behavior, /addEventListener\(\s*["']click["']/);
+  assert.match(behavior, /addEventListener\(\s*["']keydown["']/);
+  assert.match(behavior, /event\.key\s*===\s*["']Escape["']/);
+  assert.match(behavior, /setAttribute\(\s*["']aria-expanded["']/);
+  assert.match(behavior, /toggleAttribute\(\s*["']data-open["']/);
+  assert.match(behavior, /classList\.add\(\s*["']nav-ready["']/);
+
+  assert.match(styles, /html:not\(\.nav-ready\)\s+\.site-header/);
+  assert.match(styles, /\.js\.nav-ready\s+\.nav-toggle/);
+  assert.match(styles, /\.js\.nav-ready\s+\.site-menu:not\(\[data-open\]\)/);
+});
+
+test("README entry points and Pages workflow publish the tutorial", async () => {
+  const [readme, englishReadme, workflow] = await Promise.all([
+    readFile(readmeUrl, "utf8"),
+    readFile(englishReadmeUrl, "utf8"),
+    readFile(pagesWorkflowUrl, "utf8"),
+  ]);
+
+  assert.ok(readme.includes(tutorialPageUrl));
+  assert.ok(englishReadme.includes(tutorialPageUrl));
+  assert.match(workflow, /paths:\s*[\s\S]*?["']docs\/\*\*["']/);
+  assert.match(workflow, /actions\/upload-pages-artifact@[0-9a-f]{40}/);
+  assert.match(workflow, /with:\s*\n\s+path:\s*docs(?:\s|$)/);
+  assert.match(workflow, /actions\/deploy-pages@[0-9a-f]{40}/);
 });
