@@ -326,6 +326,7 @@ h2 {
 .product-shot img,
 .step figure img {
   width: 100%;
+  height: auto;
   aspect-ratio: 8 / 5;
   background: var(--surface);
   object-fit: contain;
