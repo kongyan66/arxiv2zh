@@ -423,7 +423,7 @@ jobs:
           path: docs
       - name: Deploy Pages
         id: deployment
-        uses: actions/deploy-pages@211ad2aab481c6548bcb7c8b62175c6917f4c1ed # v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
 ```
 
 - [ ] **Step 3: Run repository checks**
