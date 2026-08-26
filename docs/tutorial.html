@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="no-js">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +9,9 @@
       content="arxiv2zh 快速上手：在 Zotero 中翻译 arXiv 论文并自动归档中文 PDF。"
     />
     <title>arxiv2zh · Zotero arXiv 中文翻译快速上手</title>
+    <script>
+      document.documentElement.classList.replace("no-js", "js");
+    </script>
     <link rel="stylesheet" href="assets/tutorial.css" />
     <script src="assets/tutorial.js" defer></script>
   </head>
@@ -25,7 +28,7 @@
           aria-expanded="false"
           aria-controls="site-menu"
         >
-          <span class="sr-only">打开导航</span>
+          <span class="sr-only">导航菜单</span>
         </button>
         <div class="site-menu" id="site-menu">
           <a href="#install">安装</a>
@@ -67,6 +70,8 @@
             alt="arxiv2zh 在 Zotero 中显示完成的中文 PDF 附件"
             width="1600"
             height="1000"
+            fetchpriority="high"
+            decoding="async"
           />
         </figure>
       </section>
@@ -85,6 +90,8 @@
             alt="在 Zotero 插件管理器中从文件安装 arxiv2zh"
             width="1600"
             height="1000"
+            loading="lazy"
+            decoding="async"
           />
         </figure>
       </section>
@@ -103,6 +110,8 @@
             alt="从 arxiv2zh 打开 hjfy.top 登录入口"
             width="1600"
             height="1000"
+            loading="lazy"
+            decoding="async"
           />
         </figure>
       </section>
@@ -121,6 +130,8 @@
             alt="在 Zotero 条目右键菜单中选择翻译为中文"
             width="1600"
             height="1000"
+            loading="lazy"
+            decoding="async"
           />
         </figure>
       </section>
