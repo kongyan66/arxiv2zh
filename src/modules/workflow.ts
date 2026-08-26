@@ -1,4 +1,5 @@
 import { parseArxivIdentifier, resolveArxivIdentifier } from "./arxiv";
+import { selectedLibraryID } from "./librarySelection";
 import type { TaskManager } from "./taskManager";
 
 function field(item: Zotero.Item, name: _ZoteroTypes.Item.ItemField): string {
@@ -65,7 +66,7 @@ export class TranslationWorkflow {
     }
     const target = selected ? parentItem(selected) : this.selectedTarget();
     const libraryID =
-      target?.libraryID || Zotero.getActiveZoteroPane()?.getSelectedLibraryID();
+      target?.libraryID || selectedLibraryID(Zotero.getActiveZoteroPane());
     if (!libraryID) {
       win?.alert("请先选择一个可写入的 Zotero 文库。");
       return;
