@@ -198,11 +198,9 @@ code {
 
 .hero {
   display: flex;
-  height: calc(100vh - var(--header-height) - var(--next-section-peek));
-  height: calc(100svh - var(--header-height) - var(--next-section-peek));
-  min-height: 0;
-  overflow: hidden;
-  padding: 58px var(--gutter) 48px;
+  min-height: calc(100vh - var(--header-height) - var(--next-section-peek));
+  min-height: calc(100svh - var(--header-height) - var(--next-section-peek));
+  padding: 48px var(--gutter) 40px;
   align-items: center;
   flex-direction: column;
   justify-content: center;
@@ -312,7 +310,6 @@ h2 {
 
 .product-shot,
 .step figure {
-  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
   margin: 0;
@@ -321,10 +318,9 @@ h2 {
 }
 
 .product-shot {
-  width: min(100%, 720px);
-  min-height: 72px;
-  margin-top: 38px;
-  flex: 0 1 auto;
+  width: min(100%, 480px);
+  margin-top: 28px;
+  flex: 0 0 auto;
 }
 
 .product-shot img,
@@ -408,14 +404,35 @@ footer a {
   text-underline-offset: 3px;
 }
 
+@media (min-width: 721px) and (max-width: 1100px) {
+  .hero {
+    padding-top: 36px;
+    padding-bottom: 30px;
+  }
+
+  h1 {
+    font-size: 60px;
+  }
+
+  .hero-lede {
+    margin-top: 14px;
+    font-size: 20px;
+  }
+
+  .hero-actions {
+    margin-top: 18px;
+  }
+
+  .product-shot {
+    width: min(100%, 360px);
+    margin-top: 20px;
+  }
+}
+
 @media (max-width: 900px) {
   :root {
     --gutter: 20px;
     --next-section-peek: 88px;
-  }
-
-  .hero {
-    padding-top: 48px;
   }
 
   .step {
@@ -432,6 +449,14 @@ footer a {
   :root {
     --gutter: 16px;
     --next-section-peek: 72px;
+  }
+
+  html:not(.nav-ready) {
+    scroll-padding-top: 16px;
+  }
+
+  html:not(.nav-ready) .site-header {
+    position: static;
   }
 
   .nav-shell {
@@ -483,6 +508,7 @@ footer a {
   }
 
   .product-shot {
+    width: min(100%, 360px);
     margin-top: 30px;
   }
 
@@ -529,6 +555,30 @@ footer a {
     min-width: 0;
     padding-inline: 18px;
     flex: 1 1 0;
+  }
+}
+
+@media (max-width: 720px) and (max-height: 650px) {
+  .hero {
+    padding-top: 22px;
+    padding-bottom: 20px;
+  }
+
+  .hero .eyebrow {
+    margin-bottom: 4px;
+  }
+
+  .hero-lede {
+    margin-top: 10px;
+  }
+
+  .hero-actions {
+    margin-top: 14px;
+  }
+
+  .product-shot {
+    width: min(100%, 216px);
+    margin-top: 14px;
   }
 }
 
