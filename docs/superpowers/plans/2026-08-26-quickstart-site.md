@@ -28,6 +28,7 @@
 ### Task 1: Lock the tutorial contract with failing tests
 
 **Files:**
+
 - Create: `test/unit/tutorialSite.test.mts`
 
 - [ ] **Step 1: Add static page contract tests**
@@ -41,7 +42,13 @@ const tutorialPath = new URL("../../docs/tutorial.html", import.meta.url);
 
 test("tutorial exposes the quickstart structure and project links", async () => {
   const html = await readFile(tutorialPath, "utf8");
-  for (const anchor of ["overview", "install", "login", "translate", "result"]) {
+  for (const anchor of [
+    "overview",
+    "install",
+    "login",
+    "translate",
+    "result",
+  ]) {
     assert.match(html, new RegExp(`id=["']${anchor}["']`));
   }
   assert.match(html, /<h1[^>]*>\s*arxiv2zh\s*<\/h1>/i);
@@ -52,7 +59,9 @@ test("tutorial exposes the quickstart structure and project links", async () => 
 
 test("tutorial images have local sources, dimensions, and alternative text", async () => {
   const html = await readFile(tutorialPath, "utf8");
-  const images = [...html.matchAll(/<img\s+([^>]+)>/g)].map((match) => match[1]);
+  const images = [...html.matchAll(/<img\s+([^>]+)>/g)].map(
+    (match) => match[1],
+  );
   assert.equal(images.length, 4);
   for (const attributes of images) {
     assert.match(attributes, /src=["']assets\/images\//);
@@ -92,6 +101,7 @@ git commit -m "test: define quickstart site contract"
 ### Task 2: Build semantic tutorial content
 
 **Files:**
+
 - Create: `docs/index.html`
 - Create: `docs/tutorial.html`
 
@@ -107,7 +117,10 @@ Create `docs/index.html` as an accessible immediate redirect with a usable fallb
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="refresh" content="0; url=./tutorial.html" />
     <title>arxiv2zh 使用说明</title>
-    <link rel="canonical" href="https://kongyan66.github.io/arxiv2zh/tutorial.html" />
+    <link
+      rel="canonical"
+      href="https://kongyan66.github.io/arxiv2zh/tutorial.html"
+    />
   </head>
   <body>
     <p><a href="./tutorial.html">进入 arxiv2zh 快速上手</a></p>
@@ -126,7 +139,10 @@ Create `docs/tutorial.html` with this semantic skeleton and the approved concise
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" />
-    <meta name="description" content="arxiv2zh 快速上手：在 Zotero 中翻译 arXiv 论文并自动归档中文 PDF。" />
+    <meta
+      name="description"
+      content="arxiv2zh 快速上手：在 Zotero 中翻译 arXiv 论文并自动归档中文 PDF。"
+    />
     <title>arxiv2zh · Zotero arXiv 中文翻译快速上手</title>
     <link rel="stylesheet" href="assets/tutorial.css" />
     <script src="assets/tutorial.js" defer></script>
@@ -135,11 +151,25 @@ Create `docs/tutorial.html` with this semantic skeleton and the approved concise
     <a class="skip-link" href="#main">跳到主要内容</a>
     <header class="site-header">
       <nav class="nav-shell" aria-label="主导航">
-        <a class="brand" href="#overview" aria-label="arxiv2zh 首页">arxiv2zh</a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu"><span class="sr-only">打开导航</span></button>
+        <a class="brand" href="#overview" aria-label="arxiv2zh 首页"
+          >arxiv2zh</a
+        >
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-menu"
+        >
+          <span class="sr-only">打开导航</span>
+        </button>
         <div class="site-menu" id="site-menu">
           <a href="#install">安装</a><a href="#translate">翻译</a>
-          <a href="https://github.com/kongyan66/arxiv2zh" target="_blank" rel="noreferrer">GitHub</a>
+          <a
+            href="https://github.com/kongyan66/arxiv2zh"
+            target="_blank"
+            rel="noreferrer"
+            >GitHub</a
+          >
         </div>
       </nav>
     </header>
@@ -148,20 +178,106 @@ Create `docs/tutorial.html` with this semantic skeleton and the approved concise
         <div class="hero-copy">
           <p class="eyebrow">Zotero × arXiv</p>
           <h1>arxiv2zh</h1>
-          <p class="hero-lede">简单配置，即可在 Zotero 中翻译 arXiv 论文，并自动归档排版完整的中文 PDF。</p>
+          <p class="hero-lede">
+            简单配置，即可在 Zotero 中翻译 arXiv 论文，并自动归档排版完整的中文
+            PDF。
+          </p>
           <div class="hero-actions">
-            <a class="button button-primary" href="https://github.com/kongyan66/arxiv2zh/releases/latest">下载插件</a>
-            <a class="button button-secondary" href="https://github.com/kongyan66/arxiv2zh">查看源码</a>
+            <a
+              class="button button-primary"
+              href="https://github.com/kongyan66/arxiv2zh/releases/latest"
+              >下载插件</a
+            >
+            <a
+              class="button button-secondary"
+              href="https://github.com/kongyan66/arxiv2zh"
+              >查看源码</a
+            >
           </div>
         </div>
-        <figure class="product-shot"><img src="assets/images/tutorial-result.webp" alt="arxiv2zh 在 Zotero 中显示完成的中文 PDF 附件" width="1600" height="1000" /></figure>
+        <figure class="product-shot">
+          <img
+            src="assets/images/tutorial-result.webp"
+            alt="arxiv2zh 在 Zotero 中显示完成的中文 PDF 附件"
+            width="1600"
+            height="1000"
+          />
+        </figure>
       </section>
-      <section class="step" id="install"><div class="step-copy"><p class="step-number">01</p><h2>安装插件</h2><p>从 GitHub Release 下载 <code>arxiv2zh.xpi</code>，在 Zotero 的“工具 → 插件”中选择“从文件安装插件”，随后重启 Zotero。</p></div><figure><img src="assets/images/tutorial-install.webp" alt="在 Zotero 插件管理器中从文件安装 arxiv2zh" width="1600" height="1000" /></figure></section>
-      <section class="step step-reverse" id="login"><div class="step-copy"><p class="step-number">02</p><h2>登录一次</h2><p>从 arxiv2zh 设置或任务面板打开 hjfy.top 并完成登录。Cookie 保存在当前 Zotero 配置中，无需每次重复登录。</p></div><figure><img src="assets/images/tutorial-login.webp" alt="从 arxiv2zh 打开 hjfy.top 登录入口" width="1600" height="1000" /></figure></section>
-      <section class="step" id="translate"><div class="step-copy"><p class="step-number">03</p><h2>翻译为中文</h2><p>选中包含 arXiv 信息的条目或 PDF 附件，右键选择“arxiv2zh → 翻译为中文”。</p></div><figure><img src="assets/images/tutorial-translate.webp" alt="在 Zotero 条目右键菜单中选择翻译为中文" width="1600" height="1000" /></figure></section>
-      <section class="result" id="result"><div><p class="eyebrow">完成</p><h2>中文 PDF 自动回到 Zotero</h2><p>翻译服务使用 arXiv 的 TeX 源码翻译并重新编译，尽可能保留公式、图表、引用与论文结构。完成后，中文 PDF 自动成为原条目的子附件。</p></div></section>
+      <section class="step" id="install">
+        <div class="step-copy">
+          <p class="step-number">01</p>
+          <h2>安装插件</h2>
+          <p>
+            从 GitHub Release 下载 <code>arxiv2zh.xpi</code>，在 Zotero 的“工具
+            → 插件”中选择“从文件安装插件”，随后重启 Zotero。
+          </p>
+        </div>
+        <figure>
+          <img
+            src="assets/images/tutorial-install.webp"
+            alt="在 Zotero 插件管理器中从文件安装 arxiv2zh"
+            width="1600"
+            height="1000"
+          />
+        </figure>
+      </section>
+      <section class="step step-reverse" id="login">
+        <div class="step-copy">
+          <p class="step-number">02</p>
+          <h2>登录一次</h2>
+          <p>
+            从 arxiv2zh 设置或任务面板打开 hjfy.top 并完成登录。Cookie
+            保存在当前 Zotero 配置中，无需每次重复登录。
+          </p>
+        </div>
+        <figure>
+          <img
+            src="assets/images/tutorial-login.webp"
+            alt="从 arxiv2zh 打开 hjfy.top 登录入口"
+            width="1600"
+            height="1000"
+          />
+        </figure>
+      </section>
+      <section class="step" id="translate">
+        <div class="step-copy">
+          <p class="step-number">03</p>
+          <h2>翻译为中文</h2>
+          <p>
+            选中包含 arXiv 信息的条目或 PDF 附件，右键选择“arxiv2zh →
+            翻译为中文”。
+          </p>
+        </div>
+        <figure>
+          <img
+            src="assets/images/tutorial-translate.webp"
+            alt="在 Zotero 条目右键菜单中选择翻译为中文"
+            width="1600"
+            height="1000"
+          />
+        </figure>
+      </section>
+      <section class="result" id="result">
+        <div>
+          <p class="eyebrow">完成</p>
+          <h2>中文 PDF 自动回到 Zotero</h2>
+          <p>
+            翻译服务使用 arXiv 的 TeX
+            源码翻译并重新编译，尽可能保留公式、图表、引用与论文结构。完成后，中文
+            PDF 自动成为原条目的子附件。
+          </p>
+        </div>
+      </section>
     </main>
-    <footer><p>兼容 Zotero 7–9 · arxiv2zh 是独立社区项目，hjfy.top 为第三方服务。</p><nav aria-label="页尾导航"><a href="https://github.com/kongyan66/arxiv2zh/blob/main/PRIVACY.md">隐私说明</a><a href="https://github.com/kongyan66/arxiv2zh/issues">问题反馈</a></nav></footer>
+    <footer>
+      <p>兼容 Zotero 7–9 · arxiv2zh 是独立社区项目，hjfy.top 为第三方服务。</p>
+      <nav aria-label="页尾导航">
+        <a href="https://github.com/kongyan66/arxiv2zh/blob/main/PRIVACY.md"
+          >隐私说明</a
+        ><a href="https://github.com/kongyan66/arxiv2zh/issues">问题反馈</a>
+      </nav>
+    </footer>
   </body>
 </html>
 ```
@@ -182,6 +298,7 @@ git commit -m "docs: add quickstart tutorial content"
 ### Task 3: Implement the Apple-inspired responsive presentation
 
 **Files:**
+
 - Create: `docs/assets/tutorial.css`
 - Create: `docs/assets/tutorial.js`
 
@@ -200,81 +317,333 @@ Implement `docs/assets/tutorial.css` with these required primitives:
   --brand: #087f5b;
   --brand-hover: #066b4d;
   --shell: min(1120px, calc(100% - 48px));
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
 }
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--page); color: var(--text); letter-spacing: 0; }
-.site-header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--page) 88%, transparent); backdrop-filter: saturate(180%) blur(18px); }
-.nav-shell { width: var(--shell); min-height: 52px; margin: auto; display: flex; align-items: center; justify-content: space-between; }
-.hero { min-height: calc(100svh - 52px); padding: clamp(64px, 9vh, 112px) 0 0; overflow: hidden; background: var(--band); }
-.hero-copy, .hero .product-shot, .step, .result > div, footer { width: var(--shell); margin-inline: auto; }
-.hero-copy { text-align: center; max-width: 780px; }
-h1 { margin: 12px 0 18px; font-size: clamp(52px, 7vw, 88px); line-height: 0.98; }
-h2 { margin: 0 0 18px; font-size: clamp(34px, 5vw, 58px); line-height: 1.06; }
-.hero-lede { margin: auto; max-width: 700px; color: var(--muted); font-size: clamp(19px, 2.2vw, 28px); line-height: 1.45; }
-.step { min-height: 76vh; padding-block: clamp(72px, 10vw, 144px); display: grid; grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr); gap: clamp(48px, 8vw, 112px); align-items: center; }
-.step-reverse .step-copy { order: 2; }
-figure { margin: 0; }
-.product-shot img, .step img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.12); }
-.button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: 0 21px; text-decoration: none; border-radius: 999px; }
-.button-primary { color: #fff; background: var(--brand); }
-.button-primary:hover { background: var(--brand-hover); }
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  letter-spacing: 0;
+}
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(18px);
+}
+.nav-shell {
+  width: var(--shell);
+  min-height: 52px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hero {
+  min-height: calc(100svh - 52px);
+  padding: clamp(64px, 9vh, 112px) 0 0;
+  overflow: hidden;
+  background: var(--band);
+}
+.hero-copy,
+.hero .product-shot,
+.step,
+.result > div,
+footer {
+  width: var(--shell);
+  margin-inline: auto;
+}
+.hero-copy {
+  text-align: center;
+  max-width: 780px;
+}
+h1 {
+  margin: 12px 0 18px;
+  font-size: clamp(52px, 7vw, 88px);
+  line-height: 0.98;
+}
+h2 {
+  margin: 0 0 18px;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.06;
+}
+.hero-lede {
+  margin: auto;
+  max-width: 700px;
+  color: var(--muted);
+  font-size: clamp(19px, 2.2vw, 28px);
+  line-height: 1.45;
+}
+.step {
+  min-height: 76vh;
+  padding-block: clamp(72px, 10vw, 144px);
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(48px, 8vw, 112px);
+  align-items: center;
+}
+.step-reverse .step-copy {
+  order: 2;
+}
+figure {
+  margin: 0;
+}
+.product-shot img,
+.step img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.12);
+}
+.button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 21px;
+  text-decoration: none;
+  border-radius: 999px;
+}
+.button-primary {
+  color: #fff;
+  background: var(--brand);
+}
+.button-primary:hover {
+  background: var(--brand-hover);
+}
 @media (max-width: 720px) {
-  :root { --shell: min(100% - 32px, 1120px); }
-  .step { grid-template-columns: 1fr; min-height: auto; }
-  .step-reverse .step-copy { order: initial; }
-  .site-menu { display: none; }
-  .site-menu[data-open="true"] { display: grid; position: absolute; inset: 52px 0 auto; padding: 16px; background: var(--page); }
+  :root {
+    --shell: min(100% - 32px, 1120px);
+  }
+  .step {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .step-reverse .step-copy {
+    order: initial;
+  }
+  .site-menu {
+    display: none;
+  }
+  .site-menu[data-open="true"] {
+    display: grid;
+    position: absolute;
+    inset: 52px 0 auto;
+    padding: 16px;
+    background: var(--page);
+  }
 }
 @media (prefers-color-scheme: dark) {
-  :root { --page: #000000; --band: #161617; --text: #f5f5f7; --muted: #a1a1a6; --line: rgba(255, 255, 255, 0.16); --brand: #32b98a; --brand-hover: #47c99b; }
+  :root {
+    --page: #000000;
+    --band: #161617;
+    --text: #f5f5f7;
+    --muted: #a1a1a6;
+    --line: rgba(255, 255, 255, 0.16);
+    --brand: #32b98a;
+    --brand-hover: #47c99b;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 ```
 
 Append the remaining navigation, accessibility, content, and footer rules:
 
 ```css
-body { min-width: 320px; line-height: 1.5; }
-a { color: inherit; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; padding: 9px 13px; color: #fff; background: var(--brand); transform: translateY(-150%); }
-.skip-link:focus { transform: translateY(0); }
-.brand { color: var(--brand); font-size: 18px; font-weight: 700; text-decoration: none; }
-.site-menu { display: flex; align-items: center; gap: 28px; }
-.site-menu a { color: var(--muted); font-size: 14px; text-decoration: none; }
-.site-menu a:hover { color: var(--text); }
-.nav-toggle { display: none; width: 44px; height: 44px; padding: 0; border: 0; color: var(--text); background: transparent; }
-.nav-toggle::before { content: "☰"; font-size: 20px; }
-.nav-toggle[aria-expanded="true"]::before { content: "×"; }
-.eyebrow, .step-number { margin: 0; color: var(--brand); font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
-.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
-.button-secondary { border: 1px solid var(--line); color: var(--text); background: var(--page); }
-.hero .product-shot { width: min(1120px, calc(100% - 48px)); margin: clamp(54px, 8vh, 88px) auto -18%; }
-.step-copy p:not(.step-number), .result p, footer { color: var(--muted); font-size: 18px; }
-.step-number { margin-bottom: 18px; }
-.step:nth-of-type(even) { background: var(--band); }
-.result { padding-block: clamp(92px, 14vw, 180px); text-align: center; background: var(--band); }
-.result > div { max-width: 850px; }
-.result p { max-width: 760px; margin-inline: auto; }
-footer { padding-block: 36px; display: flex; justify-content: space-between; gap: 24px; border-top: 1px solid var(--line); font-size: 13px; }
-footer p { margin: 0; }
-footer nav { display: flex; flex-wrap: wrap; gap: 20px; }
-footer a { color: var(--muted); }
-:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 72%, white); outline-offset: 3px; }
+body {
+  min-width: 320px;
+  line-height: 1.5;
+}
+a {
+  color: inherit;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 9px 13px;
+  color: #fff;
+  background: var(--brand);
+  transform: translateY(-150%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+.brand {
+  color: var(--brand);
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.site-menu {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.site-menu a {
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+.site-menu a:hover {
+  color: var(--text);
+}
+.nav-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  color: var(--text);
+  background: transparent;
+}
+.nav-toggle::before {
+  content: "☰";
+  font-size: 20px;
+}
+.nav-toggle[aria-expanded="true"]::before {
+  content: "×";
+}
+.eyebrow,
+.step-number {
+  margin: 0;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+.button-secondary {
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: var(--page);
+}
+.hero .product-shot {
+  width: min(1120px, calc(100% - 48px));
+  margin: clamp(54px, 8vh, 88px) auto -18%;
+}
+.step-copy p:not(.step-number),
+.result p,
+footer {
+  color: var(--muted);
+  font-size: 18px;
+}
+.step-number {
+  margin-bottom: 18px;
+}
+.step:nth-of-type(even) {
+  background: var(--band);
+}
+.result {
+  padding-block: clamp(92px, 14vw, 180px);
+  text-align: center;
+  background: var(--band);
+}
+.result > div {
+  max-width: 850px;
+}
+.result p {
+  max-width: 760px;
+  margin-inline: auto;
+}
+footer {
+  padding-block: 36px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+footer p {
+  margin: 0;
+}
+footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+footer a {
+  color: var(--muted);
+}
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand) 72%, white);
+  outline-offset: 3px;
+}
 @media (max-width: 720px) {
-  .nav-toggle { display: inline-grid; place-items: center; }
-  .site-menu { gap: 0; border-bottom: 1px solid var(--line); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12); }
-  .site-menu a { min-height: 44px; display: flex; align-items: center; padding-inline: 16px; }
-  .hero { min-height: auto; padding-top: 70px; }
-  .hero .product-shot { width: calc(100% - 32px); margin-top: 54px; margin-bottom: -10%; }
-  .hero-actions .button { flex: 1 1 150px; }
-  .step { gap: 36px; }
-  footer { display: grid; }
+  .nav-toggle {
+    display: inline-grid;
+    place-items: center;
+  }
+  .site-menu {
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+  }
+  .site-menu a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding-inline: 16px;
+  }
+  .hero {
+    min-height: auto;
+    padding-top: 70px;
+  }
+  .hero .product-shot {
+    width: calc(100% - 32px);
+    margin-top: 54px;
+    margin-bottom: -10%;
+  }
+  .hero-actions .button {
+    flex: 1 1 150px;
+  }
+  .step {
+    gap: 36px;
+  }
+  footer {
+    display: grid;
+  }
 }
 ```
 
@@ -315,6 +684,7 @@ git commit -m "style: add responsive tutorial presentation"
 ### Task 4: Produce privacy-safe Zotero screenshots
 
 **Files:**
+
 - Create: `docs/assets/images/tutorial-install.webp`
 - Create: `docs/assets/images/tutorial-login.webp`
 - Create: `docs/assets/images/tutorial-translate.webp`
@@ -360,6 +730,7 @@ git commit -m "docs: add privacy-safe tutorial screenshots"
 ### Task 5: Add discoverability and Pages deployment
 
 **Files:**
+
 - Modify: `README.md`
 - Modify: `README.en-US.md`
 - Create: `.github/workflows/pages.yml`
@@ -442,6 +813,7 @@ git commit -m "ci: publish quickstart with GitHub Pages"
 ### Task 6: Perform visual QA and publish
 
 **Files:**
+
 - Review and correct: `docs/tutorial.html`
 - Review and correct: `docs/assets/tutorial.css`
 - Review and correct: `docs/assets/tutorial.js`

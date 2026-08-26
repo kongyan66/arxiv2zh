@@ -19,6 +19,10 @@
 
 <p align="center"><a href="README.en-US.md">English</a></p>
 
+<p align="center">
+  <a href="https://kongyan66.github.io/arxiv2zh/tutorial.html">图文快速上手</a>
+</p>
+
 arxiv2zh 是一款面向 Zotero 7-9 的轻量级 arXiv 论文翻译插件。无需配置 API
 Key，也无需部署本地翻译环境；安装插件并登录 [hjfy.top](https://hjfy.top/)
 后，即可在 Zotero 中提交翻译任务。翻译服务基于大语言模型，使用 arXiv 提供的

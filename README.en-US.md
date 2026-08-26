@@ -19,6 +19,10 @@
 
 <p align="center"><a href="README.md">简体中文</a></p>
 
+<p align="center">
+  <a href="https://kongyan66.github.io/arxiv2zh/tutorial.html">Visual quickstart (Chinese)</a>
+</p>
+
 arxiv2zh is a lightweight arXiv translation plugin for Zotero 7-9. No API key
 or local translation environment is required: install the plugin, sign in to
 [hjfy.top](https://hjfy.top/), and submit translation tasks directly from
