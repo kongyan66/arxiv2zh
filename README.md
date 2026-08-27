@@ -11,10 +11,12 @@
 <p align="center">
   <a href="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml"><img src="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/v/release/kongyan66/arxiv2zh" alt="GitHub Release"></a>
+  <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/downloads/kongyan66/arxiv2zh/total?logo=github" alt="Downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/kongyan66/arxiv2zh" alt="AGPL-3.0-or-later"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-7-CC2936?logo=zotero&amp;logoColor=white" alt="Zotero 7"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-8-E76F2E?logo=zotero&amp;logoColor=white" alt="Zotero 8"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-9-F2C94C?logo=zotero&amp;logoColor=white" alt="Zotero 9"></a>
+  <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-10-2E86AB?logo=zotero&amp;logoColor=white" alt="Zotero 10"></a>
 </p>
 
 <p align="center"><a href="README.en-US.md">English</a></p>
@@ -23,7 +25,7 @@
   <a href="https://kongyan66.github.io/arxiv2zh/tutorial.html">图文快速上手</a>
 </p>
 
-arxiv2zh 是一款面向 Zotero 7-9 的轻量级 arXiv 论文翻译插件。无需配置 API
+arxiv2zh 是一款面向 Zotero 7-10 的轻量级 arXiv 论文翻译插件。无需配置 API
 Key，也无需部署本地翻译环境；安装插件并登录 [hjfy.top](https://hjfy.top/)
 后，即可在 Zotero 中提交翻译任务。翻译服务基于大语言模型，使用 arXiv 提供的
 TeX 源码进行翻译与重新编译，在尽可能保留公式、图表、引用和论文结构的同时，
@@ -45,7 +47,7 @@ TeX 源码进行翻译与重新编译，在尽可能保留公式、图表、引�
 
 ## 环境要求
 
-- Zotero 7、8 或 9。
+- Zotero 7、8、9 或 10。
 - 可访问 hjfy.top 及其返回的 PDF 下载地址。
 - 论文在 arXiv 上提供可处理的 LaTeX 源码。
 - hjfy.top 账号；是否需要登录由服务端状态决定。

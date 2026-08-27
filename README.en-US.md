@@ -11,10 +11,12 @@
 <p align="center">
   <a href="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml"><img src="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/v/release/kongyan66/arxiv2zh" alt="GitHub Release"></a>
+  <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/downloads/kongyan66/arxiv2zh/total?logo=github" alt="Downloads"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/kongyan66/arxiv2zh" alt="AGPL-3.0-or-later"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-7-CC2936?logo=zotero&amp;logoColor=white" alt="Zotero 7"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-8-E76F2E?logo=zotero&amp;logoColor=white" alt="Zotero 8"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-9-F2C94C?logo=zotero&amp;logoColor=white" alt="Zotero 9"></a>
+  <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-10-2E86AB?logo=zotero&amp;logoColor=white" alt="Zotero 10"></a>
 </p>
 
 <p align="center"><a href="README.md">简体中文</a></p>
@@ -23,7 +25,7 @@
   <a href="https://kongyan66.github.io/arxiv2zh/tutorial.html">Visual quickstart (Chinese)</a>
 </p>
 
-arxiv2zh is a lightweight arXiv translation plugin for Zotero 7-9. No API key
+arxiv2zh is a lightweight arXiv translation plugin for Zotero 7-10. No API key
 or local translation environment is required: install the plugin, sign in to
 [hjfy.top](https://hjfy.top/), and submit translation tasks directly from
 Zotero. The service uses large language models and translates from the TeX
@@ -50,7 +52,7 @@ Zotero item.
 
 ## Requirements
 
-- Zotero 7, 8, or 9.
+- Zotero 7, 8, 9, or 10.
 - Network access to hjfy.top and the PDF download URL returned by the service.
 - An arXiv paper with processable LaTeX source.
 - A hjfy.top account when the service requests sign-in.
