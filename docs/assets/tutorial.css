@@ -13,9 +13,8 @@
   --footer-text: #f5f5f7;
   --shadow: 0 12px 34px rgb(0 0 0 / 10%);
   --gutter: 24px;
-  --content-width: 1120px;
+  --content-width: 1280px;
   --header-height: 52px;
-  --next-section-peek: 112px;
 }
 
 *,
@@ -198,12 +197,10 @@ code {
 
 .hero {
   display: flex;
-  min-height: calc(100vh - var(--header-height) - var(--next-section-peek));
-  min-height: calc(100svh - var(--header-height) - var(--next-section-peek));
-  padding: 48px var(--gutter) 40px;
+  padding: 44px var(--gutter) 64px;
   align-items: center;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   background: var(--page);
   text-align: center;
 }
@@ -263,6 +260,14 @@ h2 {
   gap: 12px;
 }
 
+.service-note {
+  max-width: 680px;
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 .button {
   display: inline-flex;
   min-width: 112px;
@@ -318,8 +323,8 @@ h2 {
 }
 
 .product-shot {
-  width: min(100%, 480px);
-  margin-top: 28px;
+  width: min(100%, 960px);
+  margin-top: 36px;
   flex: 0 0 auto;
 }
 
@@ -334,10 +339,10 @@ h2 {
 
 .step {
   display: grid;
-  padding: 104px max(var(--gutter), calc((100% - var(--content-width)) / 2));
-  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  padding: 96px max(var(--gutter), calc((100% - var(--content-width)) / 2));
+  grid-template-columns: minmax(260px, 0.52fr) minmax(0, 1fr);
   align-items: center;
-  gap: 72px;
+  gap: 52px;
 }
 
 #install,
@@ -350,7 +355,7 @@ h2 {
 }
 
 .step-copy {
-  max-width: 460px;
+  max-width: 440px;
 }
 
 .step-copy p:last-child,
@@ -365,6 +370,10 @@ h2 {
 
 .step-reverse figure {
   order: 1;
+}
+
+.step-reverse {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.52fr);
 }
 
 .result {
@@ -408,7 +417,7 @@ footer a {
 @media (min-width: 721px) and (max-width: 1100px) {
   .hero {
     padding-top: 36px;
-    padding-bottom: 30px;
+    padding-bottom: 56px;
   }
 
   h1 {
@@ -423,33 +432,40 @@ footer a {
   .hero-actions {
     margin-top: 18px;
   }
-
-  .product-shot {
-    width: min(100%, 360px);
-    margin-top: 20px;
-  }
 }
 
 @media (max-width: 900px) {
   :root {
     --gutter: 20px;
-    --next-section-peek: 88px;
   }
 
   .step {
-    padding-block: 80px;
-    gap: 40px;
+    padding-block: 72px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
   }
 
   h2 {
     font-size: 38px;
+  }
+
+  .step-reverse {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .step-reverse .step-copy,
+  .step-reverse figure {
+    order: initial;
+  }
+
+  .step-copy {
+    max-width: none;
   }
 }
 
 @media (max-width: 720px) {
   :root {
     --gutter: 16px;
-    --next-section-peek: 72px;
   }
 
   html:not(.nav-ready) {
@@ -487,8 +503,8 @@ footer a {
   }
 
   .hero {
-    padding-top: 38px;
-    padding-bottom: 38px;
+    padding-top: 30px;
+    padding-bottom: 48px;
   }
 
   h1 {
@@ -509,23 +525,13 @@ footer a {
   }
 
   .product-shot {
-    width: min(100%, 360px);
-    margin-top: 30px;
+    width: 100%;
+    margin-top: 28px;
   }
 
   .step {
     padding-block: 64px;
-    grid-template-columns: minmax(0, 1fr);
     gap: 30px;
-  }
-
-  .step-reverse .step-copy,
-  .step-reverse figure {
-    order: initial;
-  }
-
-  .step-copy {
-    max-width: none;
   }
 
   .result {
@@ -577,9 +583,12 @@ footer a {
     margin-top: 14px;
   }
 
-  .product-shot {
-    width: min(100%, 216px);
+  .service-note {
     margin-top: 14px;
+  }
+
+  .product-shot {
+    margin-top: 20px;
   }
 }
 
