@@ -223,9 +223,24 @@ test("tutorial page uses four accessible, dimensioned local images", async () =>
   for (const image of images) {
     assert.match(requiredAttribute(image, "src"), /^assets\/images\//);
     assert.ok(requiredAttribute(image, "alt").trim());
-    assert.match(requiredAttribute(image, "width"), /^\d+$/);
-    assert.match(requiredAttribute(image, "height"), /^\d+$/);
+    assert.equal(requiredAttribute(image, "width"), "1600");
+    assert.equal(requiredAttribute(image, "height"), "1000");
   }
+});
+
+test("tutorial layout gives product demonstrations visual priority", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+
+  assert.match(styles, /--content-width:\s*1280px/);
+  assert.match(styles, /\.product-shot\s*{[^}]*width:\s*min\(100%,\s*960px\)/s);
+  assert.match(
+    styles,
+    /\.step\s*{[^}]*grid-template-columns:\s*minmax\([^;]+0\.52fr\)\s+minmax\(0,\s*1fr\)/s,
+  );
+  assert.doesNotMatch(
+    styles,
+    /\.product-shot\s*{[^}]*width:\s*min\(100%,\s*216px\)/s,
+  );
 });
 
 test("tutorial references existing local styles, behavior, and screenshots", async () => {
