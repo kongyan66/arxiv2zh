@@ -315,6 +315,7 @@ h2 {
 
 .product-shot,
 .step figure {
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
   margin: 0;
@@ -335,6 +336,27 @@ h2 {
   aspect-ratio: 8 / 5;
   background: var(--surface);
   object-fit: contain;
+}
+
+.product-shot img {
+  transform: scale(1.08);
+  transform-origin: 85% center;
+}
+
+.step figure img {
+  transform: scale(1.06);
+}
+
+#install figure img {
+  transform-origin: 65% center;
+}
+
+#login figure img {
+  transform-origin: center;
+}
+
+#translate figure img {
+  transform-origin: 60% center;
 }
 
 .step {
@@ -527,6 +549,14 @@ footer a {
   .product-shot {
     width: 100%;
     margin-top: 28px;
+  }
+
+  .product-shot img {
+    transform: scale(1.1);
+  }
+
+  .step figure img {
+    transform: scale(1.08);
   }
 
   .step {

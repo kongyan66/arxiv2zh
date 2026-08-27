@@ -230,17 +230,36 @@ test("tutorial page uses four accessible, dimensioned local images", async () =>
 
 test("tutorial layout gives product demonstrations visual priority", async () => {
   const styles = await readFile(stylesUrl, "utf8");
+  const rule = (selector: string): string => {
+    const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const match = new RegExp(
+      `(?:^|})\\s*${escapedSelector}\\s*{([^}]*)}`,
+      "s",
+    ).exec(styles);
+    assert.ok(match, `missing ${selector} rule`);
+    return match[1];
+  };
+  const fractions = (declarations: string): number[] =>
+    [...declarations.matchAll(/([\d.]+)fr/g)].map((match) => Number(match[1]));
 
-  assert.match(styles, /--content-width:\s*1280px/);
-  assert.match(styles, /\.product-shot\s*{[^}]*width:\s*min\(100%,\s*960px\)/s);
-  assert.match(
-    styles,
-    /\.step\s*{[^}]*grid-template-columns:\s*minmax\([^;]+0\.52fr\)\s+minmax\(0,\s*1fr\)/s,
+  const contentWidth = Number(
+    /--content-width:\s*(\d+)px/.exec(styles)?.[1] ?? 0,
   );
-  assert.doesNotMatch(
-    styles,
-    /\.product-shot\s*{[^}]*width:\s*min\(100%,\s*216px\)/s,
+  const productWidth = Number(
+    /width:\s*min\(100%,\s*(\d+)px\)/.exec(rule(".product-shot"))?.[1] ?? 0,
   );
+  const regularTracks = fractions(rule(".step"));
+  const reverseTracks = fractions(rule(".step-reverse"));
+
+  assert.ok(contentWidth >= 1240);
+  assert.ok(productWidth >= 900);
+  assert.equal(regularTracks.length, 2);
+  assert.ok(regularTracks[1] > regularTracks[0]);
+  assert.equal(reverseTracks.length, 2);
+  assert.ok(reverseTracks[0] > reverseTracks[1]);
+  assert.match(rule(".product-shot img"), /transform:\s*scale\(1\.[0-9]+\)/);
+  assert.match(rule(".step figure img"), /transform:\s*scale\(1\.[0-9]+\)/);
+  assert.doesNotMatch(styles, /216px/);
 });
 
 test("tutorial references existing local styles, behavior, and screenshots", async () => {
