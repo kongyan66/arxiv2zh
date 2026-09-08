@@ -5,6 +5,13 @@ All notable changes to arxiv2zh are documented here. The project follows
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-09-08
+
+### Fixed
+
+- Complete and import translations when the hjfy result omits the paper title,
+  using the title already retrieved from arXiv metadata.
+
 ## [0.1.4] - 2026-08-26
 
 ### Changed
@@ -50,7 +57,8 @@ All notable changes to arxiv2zh are documented here. The project follows
 - Only arXiv papers with processable source and Chinese PDF output are supported.
 - Stopping a task does not cancel remote service processing.
 
-[Unreleased]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/kongyan66/arxiv2zh/releases/tag/v0.1.2
