@@ -117,6 +117,11 @@ function requiredString(
   return value;
 }
 
+function optionalString(data: JsonRecord | undefined, field: string): string {
+  const value = data?.[field];
+  return typeof value === "string" ? value.trim() : "";
+}
+
 function endpointLabel(url: string): string {
   try {
     return new URL(url).pathname.split("/").filter(Boolean).pop() || "请求";
@@ -210,7 +215,7 @@ export class HjfyClient {
     }
     return {
       id: requiredString(envelope.data, "id", "arxivFiles"),
-      title: requiredString(envelope.data, "title", "arxivFiles"),
+      title: optionalString(envelope.data, "title"),
       originalURL: requiredString(envelope.data, "origin", "arxivFiles"),
       translatedURL: requiredString(envelope.data, "zhCN", "arxivFiles"),
       sourceArchiveURL:

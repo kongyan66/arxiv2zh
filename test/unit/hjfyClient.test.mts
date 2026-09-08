@@ -71,7 +71,7 @@ test("maps login, active, finished, and failed statuses", async () => {
   );
 });
 
-test("validates result fields", async () => {
+test("parses result files and preserves a non-empty title", async () => {
   const client = new HjfyClient(
     "https://hjfy.top",
     transport({
@@ -86,18 +86,47 @@ test("validates result fields", async () => {
       },
     }),
   );
+  assert.equal((await client.getFiles(identifier)).title, "Matrix Calculus");
   assert.equal(
     (await client.getFiles(identifier)).translatedURL,
     "https://files/translated.pdf",
   );
+});
 
+test("accepts an empty or missing result title", async () => {
+  for (const title of ["", "   ", undefined]) {
+    const data: Record<string, unknown> = {
+      id: "2501.14787",
+      origin: "https://files/original.pdf",
+      zhCN: "https://files/translated.pdf",
+    };
+    if (title !== undefined) data.title = title;
+
+    const files = await new HjfyClient(
+      "https://hjfy.top",
+      transport({ status: 0, data }),
+    ).getFiles(identifier);
+    assert.equal(files.title, "");
+  }
+});
+
+test("rejects result files without a translated PDF URL", async () => {
   await assert.rejects(
     new HjfyClient(
       "https://hjfy.top",
-      transport({ status: 0, data: { id: "2501.14787" } }),
+      transport({
+        status: 0,
+        data: {
+          id: "2501.14787",
+          title: "Matrix Calculus",
+          origin: "https://files/original.pdf",
+        },
+      }),
     ).getFiles(identifier),
     (error: unknown) =>
-      error instanceof HjfyError && error.code === "invalid-response",
+      error instanceof HjfyError &&
+      error.code === "invalid-response" &&
+      error.message === "arxivFiles响应缺少字段 zhCN",
   );
 });
 
