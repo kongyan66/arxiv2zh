@@ -13,6 +13,8 @@ test("creates stable duplicate keys", () => {
     taskDedupeKey(1, undefined, "HEP-TH/9901001"),
     "1:new:hep-th/9901001",
   );
+  assert.equal(taskDedupeKey(1, 42, "", 7), "1:42:file:7");
+  assert.notEqual(taskDedupeKey(1, 42, "", 7), taskDedupeKey(1, 42, "", 8));
 });
 
 test("creates and transitions tasks", () => {

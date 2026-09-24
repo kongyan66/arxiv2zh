@@ -77,7 +77,11 @@ Select a regular item or one of its PDF attachments, then choose
 items can be submitted as a batch.
 
 The plugin searches the item URL, DOI, Extra field, and attachment metadata. If
-it cannot find an arXiv ID, it opens the manual input prompt.
+there is no arXiv ID but the item has a locally available source PDF attachment,
+it uploads that PDF to hjfy.top's document mode. It does the same when the
+service explicitly reports that the arXiv paper has no LaTeX source. A missing
+PDF prompts you to add one or enter an arXiv ID. The web service requires
+sign-in and limits uploads to 50 MB.
 
 ### Enter an arXiv address
 
@@ -112,12 +116,13 @@ The service URL must use HTTPS. HTTP is accepted only for local development.
 
 arxiv2zh contains no telemetry or advertising and does not store passwords.
 
-| Data                                                     | Location and purpose                                                      |
-| -------------------------------------------------------- | ------------------------------------------------------------------------- |
-| arXiv ID, title, Zotero item IDs, status, and timestamps | `arxiv2zh/tasks.json` inside the Zotero data directory, for task recovery |
-| Sign-in cookies                                          | Zotero's built-in Firefox profile storage, to retain the service session  |
-| Translated PDF                                           | Zotero attachment storage                                                 |
-| Service URL and behavior settings                        | Zotero plugin preferences                                                 |
+| Data                                                     | Location and purpose                                                                           |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| arXiv ID, title, Zotero item IDs, status, and timestamps | `arxiv2zh/tasks.json` inside the Zotero data directory, for task recovery                      |
+| Sign-in cookies                                          | Zotero's built-in Firefox profile storage, to retain the service session                       |
+| Translated PDF                                           | Zotero attachment storage                                                                      |
+| Source PDF (fallback only)                               | Uploaded to the configured hjfy.top service for translation; identical files may share results |
+| Service URL and behavior settings                        | Zotero plugin preferences                                                                      |
 
 The plugin sends an arXiv ID that you explicitly submit to the configured
 service and accesses the PDF URL returned by that service. The download URL may
@@ -127,8 +132,7 @@ belong to a separate third-party storage domain. See the full
 ## Known limitations
 
 - hjfy.top does not publish a versioned API contract.
-- Only arXiv papers and Chinese PDF output are supported; arbitrary local PDFs
-  are not accepted.
+- Local PDF fallback requires a source attachment on a regular Zotero item.
 - Stopping a task only stops local polling because there is no known public
   remote cancellation endpoint.
 - Task history is not synchronized through Zotero Sync.
@@ -139,7 +143,7 @@ belong to a separate third-party storage domain. See the full
 
 - **Blank sign-in page:** update the plugin and verify that hjfy.top opens in a
   regular browser.
-- **No LaTeX source:** the paper cannot be processed by the current service.
+- **No LaTeX source:** attach a local source PDF to the item and retry.
 - **Waiting for sign-in:** open the account page in Preferences, or clear the
   session and sign in again.
 - **Invalid response or download failure:** retry later and confirm that the

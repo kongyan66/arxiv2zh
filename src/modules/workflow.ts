@@ -15,6 +15,28 @@ function parentItem(item: Zotero.Item): Zotero.Item | undefined {
   return item.parentID ? Zotero.Items.get(item.parentID) : undefined;
 }
 
+function isSourcePDF(item: Zotero.Item): boolean {
+  if (!item.isAttachment()) return false;
+  const name = String(item.attachmentFilename || "");
+  return (
+    (item.attachmentContentType === "application/pdf" ||
+      /\.pdf$/i.test(name)) &&
+    !/_zh_cn\.pdf$/i.test(name) &&
+    !/^(中文翻译|Chinese Translation) - arxiv2zh$/.test(field(item, "title"))
+  );
+}
+
+async function sourcePDF(
+  selected: Zotero.Item,
+  target: Zotero.Item,
+): Promise<Zotero.Item | undefined> {
+  if (isSourcePDF(selected)) return selected;
+  const attachments = await Zotero.Items.getAsync(target.getAttachments());
+  return attachments.find(
+    (attachment) => attachment && isSourcePDF(attachment),
+  );
+}
+
 export function resolveItemArxiv(item: Zotero.Item) {
   const parent = parentItem(item);
   return resolveArxivIdentifier([
@@ -27,7 +49,11 @@ export function resolveItemArxiv(item: Zotero.Item) {
 }
 
 export class TranslationWorkflow {
-  constructor(private readonly manager: TaskManager) {}
+  private readonly manager: TaskManager;
+
+  constructor(manager: TaskManager) {
+    this.manager = manager;
+  }
 
   async submitItems(
     items: Zotero.Item[],
@@ -39,9 +65,11 @@ export class TranslationWorkflow {
       const target = parentItem(selected);
       if (!target || !target.isRegularItem()) continue;
       const identifier = resolveItemArxiv(selected);
-      if (!identifier) continue;
+      const pdf = await sourcePDF(selected, target);
+      if (!identifier && !pdf) continue;
       await this.manager.submit({
-        identifier,
+        identifier: identifier || undefined,
+        sourceAttachmentID: pdf?.id,
         libraryID: target.libraryID,
         targetItemID: target.id,
         forceDownload,
@@ -71,11 +99,17 @@ export class TranslationWorkflow {
       win?.alert("请先选择一个可写入的 Zotero 文库。");
       return;
     }
-    void this.manager.submit({
-      identifier,
-      libraryID,
-      targetItemID: target?.isRegularItem() ? target.id : undefined,
-    });
+    void (async () => {
+      const pdf = target?.isRegularItem()
+        ? await sourcePDF(target, target)
+        : undefined;
+      await this.manager.submit({
+        identifier,
+        sourceAttachmentID: pdf?.id,
+        libraryID,
+        targetItemID: target?.isRegularItem() ? target.id : undefined,
+      });
+    })();
   }
 
   private selectedTarget(): Zotero.Item | undefined {

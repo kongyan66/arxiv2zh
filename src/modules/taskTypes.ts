@@ -18,6 +18,11 @@ export interface TranslationTask {
   attachmentID?: number;
   title?: string;
   sourceURL: string;
+  mode?: "arxiv" | "file";
+  sourceAttachmentID?: number;
+  sourceFileName?: string;
+  remoteKind?: "arxiv" | "file";
+  remoteID?: string;
   status: TaskStatus;
   detail: string;
   error?: string;
@@ -40,8 +45,12 @@ export function taskDedupeKey(
   libraryID: number,
   targetItemID: number | undefined,
   baseArxivId: string,
+  sourceAttachmentID?: number,
 ): string {
-  return `${libraryID}:${targetItemID ?? "new"}:${baseArxivId.toLowerCase()}`;
+  const source = baseArxivId
+    ? baseArxivId.toLowerCase()
+    : `file:${sourceAttachmentID ?? "missing"}`;
+  return `${libraryID}:${targetItemID ?? "new"}:${source}`;
 }
 
 export function createTranslationTask(input: {
@@ -50,6 +59,9 @@ export function createTranslationTask(input: {
   libraryID: number;
   targetItemID?: number;
   sourceURL: string;
+  mode?: "arxiv" | "file";
+  sourceAttachmentID?: number;
+  sourceFileName?: string;
   forceDownload?: boolean;
   batchID?: string;
   now?: Date;
@@ -63,12 +75,16 @@ export function createTranslationTask(input: {
       input.libraryID,
       input.targetItemID,
       input.baseArxivId,
+      input.sourceAttachmentID,
     ),
     arxivId: input.arxivId,
     baseArxivId: input.baseArxivId,
     libraryID: input.libraryID,
     targetItemID: input.targetItemID,
     sourceURL: input.sourceURL,
+    mode: input.mode || "arxiv",
+    sourceAttachmentID: input.sourceAttachmentID,
+    sourceFileName: input.sourceFileName,
     status: "queued",
     detail: "等待处理",
     attempts: 0,

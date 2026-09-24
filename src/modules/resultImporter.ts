@@ -9,8 +9,12 @@ function attachmentTitle(): string {
 }
 
 export function translatedFileName(identifier: ArxivIdentifier): string {
-  const id = identifier.id.replace(/[/\\]/g, "_");
-  return Array.from(`${id}_zh_CN.pdf`)
+  return translatedDocumentFileName(identifier.id);
+}
+
+export function translatedDocumentFileName(sourceFileName: string): string {
+  const base = sourceFileName.replace(/\.pdf$/i, "").replace(/[/\\]/g, "_");
+  return Array.from(`${base}_zh_CN.pdf`)
     .map((character) =>
       character.charCodeAt(0) < 32 || /[<>:"/\\|?*]/.test(character)
         ? "_"
@@ -23,9 +27,15 @@ export function translatedFileName(identifier: ArxivIdentifier): string {
 export class ResultImporter {
   async findExisting(
     targetItem: Zotero.Item,
-    identifier: ArxivIdentifier,
+    identifier?: ArxivIdentifier,
+    sourceFileName?: string,
   ): Promise<Zotero.Item | undefined> {
-    const expectedBase = identifier.baseId.replace(/[/\\]/g, "_").toLowerCase();
+    const expectedBase = identifier?.baseId
+      .replace(/[/\\]/g, "_")
+      .toLowerCase();
+    const expectedName = sourceFileName
+      ? translatedDocumentFileName(sourceFileName).toLowerCase()
+      : undefined;
     const attachments = await Zotero.Items.getAsync(
       targetItem.getAttachments(),
     );
@@ -37,25 +47,43 @@ export class ResultImporter {
       ).toLowerCase();
       return (
         (title === TITLE_ZH || title === TITLE_EN) &&
-        fileName.startsWith(expectedBase) &&
-        fileName.endsWith("_zh_cn.pdf")
+        (expectedName
+          ? fileName === expectedName
+          : !!expectedBase &&
+            fileName.startsWith(expectedBase) &&
+            fileName.endsWith("_zh_cn.pdf"))
       );
     });
   }
 
   async importPDF(options: {
     bytes: Uint8Array;
-    identifier: ArxivIdentifier;
+    identifier?: ArxivIdentifier;
+    sourceFileName?: string;
     targetItem: Zotero.Item;
     forceDownload: boolean;
     openAfterImport: boolean;
   }): Promise<Zotero.Item> {
-    const { bytes, identifier, targetItem, forceDownload, openAfterImport } =
-      options;
-    const fileName = translatedFileName(identifier);
+    const {
+      bytes,
+      identifier,
+      sourceFileName,
+      targetItem,
+      forceDownload,
+      openAfterImport,
+    } = options;
+    if (!identifier && !sourceFileName)
+      throw new Error("翻译任务缺少原始 PDF 信息");
+    const fileName = identifier
+      ? translatedFileName(identifier)
+      : translatedDocumentFileName(sourceFileName!);
     validatePDFBytes(bytes, fileName);
 
-    const existing = await this.findExisting(targetItem, identifier);
+    const existing = await this.findExisting(
+      targetItem,
+      identifier,
+      sourceFileName,
+    );
     if (existing && !forceDownload) return existing;
 
     if (existing && forceDownload) {

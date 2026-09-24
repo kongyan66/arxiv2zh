@@ -3,6 +3,7 @@ import test from "node:test";
 import { parseArxivIdentifier } from "../../src/modules/arxiv.ts";
 import {
   createZoteroTransport,
+  encodePDFMultipart,
   HjfyClient,
   HjfyError,
   normalizeServiceURL,
@@ -151,6 +152,100 @@ test("fetches arXiv Atom metadata from the public arXiv API", async () => {
   assert.equal(url.pathname, "/api/query");
   assert.equal(url.searchParams.get("id_list"), identifier.id);
   assert.equal(url.searchParams.get("max_results"), "1");
+});
+
+test("accepts a missing metadata field when the service reports no source", async () => {
+  for (const hasSrc of [false, 0, null]) {
+    const client = new HjfyClient(
+      "https://hjfy.top",
+      transport({ status: 0, data: { hasSrc } }),
+    );
+    assert.deepEqual(await client.getInfo(identifier), {
+      atomXML: "",
+      hasSource: false,
+    });
+  }
+});
+
+test("uploads a PDF and follows file task endpoints", async () => {
+  const requests: string[] = [];
+  const client = new HjfyClient("https://hjfy.top", {
+    async getText() {
+      return "";
+    },
+    async getJSON(url) {
+      requests.push(url);
+      if (url.includes("fileStatus")) {
+        return { status: 0, data: { status: "finished" } };
+      }
+      return {
+        status: 0,
+        data: {
+          origin: "https://files/original.pdf",
+          zhCN: "https://files/translated.pdf",
+        },
+      };
+    },
+    async getBytes() {
+      return new Uint8Array([1]);
+    },
+    async postPDF(url, fileName, bytes) {
+      assert.equal(url, "https://hjfy.top/api/uploadFiles");
+      assert.equal(fileName, "论文.pdf");
+      assert.deepEqual(bytes, new Uint8Array([0, 255, 13, 10]));
+      return { status: 0, data: { fileKey: "file-key" } };
+    },
+  });
+  assert.deepEqual(
+    await client.uploadPDF("论文.pdf", new Uint8Array([0, 255, 13, 10])),
+    { kind: "file", id: "file-key" },
+  );
+  assert.equal((await client.getStatus("file-key", "file")).kind, "finished");
+  const files = await client.getFiles("file-key", "file");
+  assert.equal(files.id, "file-key");
+  assert.equal(files.translatedURL, "https://files/translated.pdf");
+  assert.deepEqual(requests, [
+    "https://hjfy.top/api/fileStatus/file-key",
+    "https://hjfy.top/api/fileFiles/file-key",
+  ]);
+  assert.equal(client.fileURL("file-key"), "https://hjfy.top/file/file-key");
+});
+
+test("handles upload login and arXiv deduplication responses", async () => {
+  for (const [response, expected] of [
+    [{ status: 101 }, { kind: "login-required" }],
+    [
+      { status: 302, arxivId: "2501.14787" },
+      { kind: "arxiv", id: "2501.14787" },
+    ],
+  ] as const) {
+    const client = new HjfyClient("https://hjfy.top", {
+      ...transport({}),
+      async postPDF() {
+        return response;
+      },
+    });
+    assert.deepEqual(
+      await client.uploadPDF("paper.pdf", new Uint8Array([1])),
+      expected,
+    );
+  }
+});
+
+test("multipart upload preserves binary bytes and UTF-8 file name", () => {
+  const body = encodePDFMultipart(
+    "论文.pdf",
+    new Uint8Array([0, 255, 13, 10]),
+    "test-boundary",
+  );
+  const binaryStart = body.indexOf(0);
+  assert.deepEqual(
+    Array.from(body.slice(binaryStart, binaryStart + 4)),
+    [0, 255, 13, 10],
+  );
+  const decoder = new TextDecoder();
+  assert.match(decoder.decode(body), /name="fileName"\r\n\r\n论文\.pdf/);
+  assert.ok(body.indexOf(255) > 0);
 });
 
 test("wraps Zotero HTTP failures in user-facing errors", async () => {

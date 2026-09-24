@@ -40,6 +40,7 @@ export interface HjfyTransport {
   getText(url: string): Promise<string>;
   getJSON(url: string): Promise<unknown>;
   getBytes(url: string): Promise<Uint8Array>;
+  postPDF?(url: string, fileName: string, bytes: Uint8Array): Promise<unknown>;
 }
 
 export type HjfyErrorCode =
@@ -47,6 +48,7 @@ export type HjfyErrorCode =
   | "invalid-response"
   | "remote-error"
   | "missing-source"
+  | "upload-failed"
   | "download-failed";
 
 export class HjfyError extends Error {
@@ -165,15 +167,57 @@ export class HjfyClient {
         envelope.message || "无法读取 arXiv 元数据",
       );
     }
+    const hasSource =
+      envelope.data?.hasSrc === undefined || Boolean(envelope.data.hasSrc);
     return {
-      atomXML: requiredString(envelope.data, "meta", "arxivInfo"),
-      hasSource: envelope.data?.hasSrc !== false,
+      atomXML: hasSource
+        ? requiredString(envelope.data, "meta", "arxivInfo")
+        : optionalString(envelope.data, "meta"),
+      hasSource,
     };
   }
 
-  async getStatus(identifier: ArxivIdentifier): Promise<HjfyStatus> {
+  async uploadPDF(
+    fileName: string,
+    bytes: Uint8Array,
+  ): Promise<
+    | { kind: "login-required" }
+    | { kind: "file"; id: string }
+    | { kind: "arxiv"; id: string }
+  > {
+    if (!this.transport.postPDF) {
+      throw new HjfyError("upload-failed", "当前传输层不支持 PDF 上传");
+    }
+    const raw = await this.transport.postPDF(
+      this.endpoint("/api/uploadFiles"),
+      fileName,
+      bytes,
+    );
+    const envelope = responseEnvelope(raw);
+    if (envelope.status === 101) return { kind: "login-required" };
+    if (envelope.status === 302 && isRecord(raw)) {
+      const id = raw.arxivId;
+      if (typeof id === "string" && id.trim()) {
+        return { kind: "arxiv", id: id.trim() };
+      }
+      throw new HjfyError("invalid-response", "上传响应缺少 arxivId");
+    }
+    if (envelope.status !== 0) {
+      throw new HjfyError("upload-failed", envelope.message || "PDF 上传失败");
+    }
+    return {
+      kind: "file",
+      id: requiredString(envelope.data, "fileKey", "uploadFiles"),
+    };
+  }
+
+  async getStatus(
+    identifier: ArxivIdentifier | string,
+    kind: "arxiv" | "file" = "arxiv",
+  ): Promise<HjfyStatus> {
+    const id = typeof identifier === "string" ? identifier : identifier.apiId;
     const raw = await this.transport.getJSON(
-      this.endpoint(`/api/arxivStatus/${encodeURIComponent(identifier.apiId)}`),
+      this.endpoint(`/api/${kind}Status/${encodeURIComponent(id)}`),
     );
     const envelope = responseEnvelope(raw);
     if (envelope.status === 101) return { kind: "login-required" };
@@ -202,9 +246,13 @@ export class HjfyClient {
     );
   }
 
-  async getFiles(identifier: ArxivIdentifier): Promise<HjfyFiles> {
+  async getFiles(
+    identifier: ArxivIdentifier | string,
+    kind: "arxiv" | "file" = "arxiv",
+  ): Promise<HjfyFiles> {
+    const id = typeof identifier === "string" ? identifier : identifier.apiId;
     const raw = await this.transport.getJSON(
-      this.endpoint(`/api/arxivFiles/${encodeURIComponent(identifier.apiId)}`),
+      this.endpoint(`/api/${kind}Files/${encodeURIComponent(id)}`),
     );
     const envelope = responseEnvelope(raw);
     if (envelope.status !== 0) {
@@ -214,10 +262,13 @@ export class HjfyClient {
       );
     }
     return {
-      id: requiredString(envelope.data, "id", "arxivFiles"),
+      id:
+        kind === "file"
+          ? optionalString(envelope.data, "id") || id
+          : requiredString(envelope.data, "id", `${kind}Files`),
       title: optionalString(envelope.data, "title"),
-      originalURL: requiredString(envelope.data, "origin", "arxivFiles"),
-      translatedURL: requiredString(envelope.data, "zhCN", "arxivFiles"),
+      originalURL: requiredString(envelope.data, "origin", `${kind}Files`),
+      translatedURL: requiredString(envelope.data, "zhCN", `${kind}Files`),
       sourceArchiveURL:
         typeof envelope.data?.zhCNTar === "string"
           ? envelope.data.zhCNTar
@@ -242,6 +293,30 @@ export class HjfyClient {
   paperURL(identifier: ArxivIdentifier): string {
     return this.endpoint(`/arxiv/${encodeURIComponent(identifier.apiId)}`);
   }
+
+  fileURL(id: string): string {
+    return this.endpoint(`/file/${encodeURIComponent(id)}`);
+  }
+}
+
+export function encodePDFMultipart(
+  fileName: string,
+  bytes: Uint8Array,
+  boundary: string,
+): Uint8Array {
+  const encoder = new TextEncoder();
+  const safeName = fileName.replace(/[\r\n"]/g, "_");
+  const prefix = encoder.encode(
+    `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${safeName}"\r\nContent-Type: application/pdf\r\n\r\n`,
+  );
+  const middle = encoder.encode(
+    `\r\n--${boundary}\r\nContent-Disposition: form-data; name="fileName"\r\n\r\n${fileName}\r\n--${boundary}--\r\n`,
+  );
+  const body = new Uint8Array(prefix.length + bytes.length + middle.length);
+  body.set(prefix);
+  body.set(bytes, prefix.length);
+  body.set(middle, prefix.length + bytes.length);
+  return body;
 }
 
 export function createZoteroTransport(): HjfyTransport {
@@ -302,6 +377,29 @@ export function createZoteroTransport(): HjfyTransport {
         return new Uint8Array(response as ArrayBuffer);
       }
       throw new HjfyError("download-failed", "服务未返回二进制 PDF");
+    },
+    async postPDF(url, fileName, bytes) {
+      const boundary = `arxiv2zh-${crypto.randomUUID()}`;
+      try {
+        const xhr = await Zotero.HTTP.request("POST", url, {
+          body: encodePDFMultipart(fileName, bytes, boundary),
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${boundary}`,
+          },
+          responseType: "text",
+          timeout: 120_000,
+          errorDelayMax: 0,
+          logBodyLength: 0,
+        });
+        try {
+          return JSON.parse(xhr.responseText || "");
+        } catch {
+          throw new HjfyError("invalid-response", "上传服务返回了无效 JSON");
+        }
+      } catch (error) {
+        if (error instanceof HjfyError) throw error;
+        throw new HjfyError("upload-failed", "PDF 上传网络请求失败");
+      }
     },
   };
 }

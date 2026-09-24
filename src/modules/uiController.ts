@@ -257,7 +257,7 @@ export class UIController {
     popup.changeHeadline(config.addonName);
     const line = new popup.ItemProgress(
       `chrome://${config.addonRef}/content/icons/favicon.png`,
-      `${task.arxivId} · ${task.detail}`,
+      `${task.arxivId || task.title || "本地 PDF"} · ${task.detail}`,
     );
     if (task.status === "failed") line.setError();
     else line.setProgress(isTerminalTask(task.status) ? 100 : 35);

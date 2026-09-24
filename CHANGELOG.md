@@ -5,6 +5,17 @@ All notable changes to arxiv2zh are documented here. The project follows
 
 ## [Unreleased]
 
+### Added
+
+- Upload an item's local source PDF to hjfy.top document translation when no
+  arXiv ID is found or the service reports that arXiv has no LaTeX source.
+- Resume uploaded document tasks and import their translated PDFs into Zotero.
+
+### Changed
+
+- Document that PDF fallback sends the complete source attachment to the
+  configured service, where identical files may share translation results.
+
 ## [0.1.5] - 2026-09-08
 
 ### Fixed

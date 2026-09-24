@@ -171,14 +171,15 @@ export class TaskPanelController {
     const heading = html<HTMLDivElement>(doc, "div");
     heading.className = "arxiv2zh-task-heading";
     const id = html<HTMLElement>(doc, "strong");
-    id.textContent = task.arxivId;
+    id.textContent = task.arxivId || "本地 PDF";
     const status = html<HTMLSpanElement>(doc, "span");
     status.textContent = STATUS_LABELS[task.status];
     heading.append(id, status);
 
     const title = html<HTMLDivElement>(doc, "div");
     title.className = "arxiv2zh-task-title";
-    title.textContent = task.title || "正在读取论文信息";
+    title.textContent =
+      task.title || (task.mode === "file" ? "本地文档" : "正在读取论文信息");
     const detail = html<HTMLDivElement>(doc, "div");
     detail.className = "arxiv2zh-task-detail";
     detail.textContent = task.detail;

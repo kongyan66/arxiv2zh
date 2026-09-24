@@ -1,20 +1,23 @@
 # Privacy Notice
 
-Last updated: 2026-08-25
+Last updated: 2026-09-23
 
 ## Summary
 
 arxiv2zh does not contain analytics, advertising, or telemetry. It does not read
 or store your hjfy.top password. The plugin sends arXiv identifiers you choose to
-submit to the configured translation service and stores enough task information
-locally to resume work after Zotero restarts.
+submit to the configured translation service. When no arXiv ID is found or the
+service reports no LaTeX source, it uploads the selected item's local source PDF
+to that service for translation. It stores enough task information locally to
+resume work after Zotero restarts.
 
 ## Local data
 
 The plugin stores these records in `arxiv2zh/tasks.json` under the active Zotero
 data directory:
 
-- arXiv ID and canonical arXiv URL;
+- arXiv ID and canonical arXiv URL when available;
+- source attachment ID, upload result key, and remote task type for PDF fallback;
 - paper title when available;
 - Zotero library, item, and attachment identifiers;
 - task status, progress details, errors, timestamps, and retry count.
@@ -38,6 +41,11 @@ For an arXiv ID you explicitly submit, the plugin requests metadata, task status
 and result information from the configured service. It then downloads the
 translated PDF from the URL returned by that service. That URL can belong to a
 separate third-party storage provider.
+
+PDF fallback uploads the complete source attachment to the configured service.
+The web service states that identical files may share translation results, so
+the upload should not be used for private documents. The plugin enforces the
+service's 50 MB PDF limit and does not persist the source PDF in its task file.
 
 Opening the website, account page, or an arXiv link is always initiated through
 a visible user action or a translation task waiting for sign-in.
