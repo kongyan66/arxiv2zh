@@ -1,8 +1,8 @@
 {
   "name": "arxiv2zh",
   "type": "module",
-  "version": "0.1.5",
-  "description": "Translate arXiv papers with hjfy.top and attach Chinese PDFs in Zotero.",
+  "version": "0.2.0",
+  "description": "Translate arXiv source or attached PDFs with hjfy.top and archive Chinese PDFs in Zotero.",
   "private": true,
   "keywords": [
     "zotero",

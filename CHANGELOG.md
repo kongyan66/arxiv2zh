@@ -5,6 +5,8 @@ All notable changes to arxiv2zh are documented here. The project follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-24
+
 ### Added
 
 - Upload an item's local source PDF to hjfy.top document translation when no
@@ -15,6 +17,8 @@ All notable changes to arxiv2zh are documented here. The project follows
 
 - Document that PDF fallback sends the complete source attachment to the
   configured service, where identical files may share translation results.
+- Prefer arXiv source for the best layout experience; PDF upload fallback may
+  take longer and depends on the original PDF's layout.
 
 ## [0.1.5] - 2026-09-08
 
@@ -68,7 +72,8 @@ All notable changes to arxiv2zh are documented here. The project follows
 - Only arXiv papers with processable source and Chinese PDF output are supported.
 - Stopping a task does not cancel remote service processing.
 
-[Unreleased]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/kongyan66/arxiv2zh/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.5...v0.2.0
 [0.1.5]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/kongyan66/arxiv2zh/compare/v0.1.2...v0.1.3

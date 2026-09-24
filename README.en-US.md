@@ -5,7 +5,7 @@
 <h1 align="center">arxiv2zh</h1>
 
 <p align="center">
-  Translate arXiv papers in Zotero with minimal setup and automatically archive well-formatted Chinese PDFs.
+  Prefer arXiv source in Zotero, fall back to PDF upload when needed, and archive the Chinese translation.
 </p>
 
 <p align="center">
@@ -25,14 +25,13 @@
   <a href="https://kongyan66.github.io/arxiv2zh/tutorial.html">Visual quickstart (Chinese)</a>
 </p>
 
-arxiv2zh is a lightweight arXiv translation plugin for Zotero 7-10. No API key
+arxiv2zh is a lightweight paper translation plugin for Zotero 7-10. No API key
 or local translation environment is required: install the plugin, sign in to
 [hjfy.top](https://hjfy.top/), and submit translation tasks directly from
-Zotero. The service uses large language models and translates from the TeX
-source provided by arXiv before recompiling the paper. This preserves formulas,
-figures, citations, and document structure as faithfully as possible, produces
-a well-formatted Chinese PDF, and automatically attaches it to the corresponding
-Zotero item.
+Zotero. The plugin prefers translation from arXiv TeX source and recompiles the
+paper for the best layout experience. If it cannot find an arXiv ID or source,
+it uploads the item's attached PDF instead. PDF translation is usually slower.
+The resulting Chinese PDF is attached to the corresponding Zotero item.
 
 > [!IMPORTANT]
 > arxiv2zh is an independent community project. It is not affiliated with or
@@ -43,6 +42,8 @@ Zotero item.
 
 - Finds arXiv IDs in item URLs, DOIs, Extra fields, and PDF attachment metadata.
 - Supports modern, legacy, and versioned IDs, plus arXiv, DOI, and alphaXiv URLs.
+- Prefers arXiv source and uploads an attached PDF when no arXiv ID or usable
+  source is available.
 - Handles batch submission, task recovery, retries, and forced re-downloads.
 - Creates a preprint item from arXiv metadata when no target item exists.
 - Validates the PDF header and trailer before importing it into Zotero storage.
@@ -54,7 +55,8 @@ Zotero item.
 
 - Zotero 7, 8, 9, or 10.
 - Network access to hjfy.top and the PDF download URL returned by the service.
-- An arXiv paper with processable LaTeX source.
+- Processable arXiv source, or a local PDF (up to 50 MB) attached to a regular
+  Zotero item.
 - A hjfy.top account when the service requests sign-in.
 
 ## Installation
@@ -76,12 +78,14 @@ Select a regular item or one of its PDF attachments, then choose
 **arxiv2zh → Translate to Chinese** from the context menu. Multiple selected
 items can be submitted as a batch.
 
-The plugin searches the item URL, DOI, Extra field, and attachment metadata. If
-there is no arXiv ID but the item has a locally available source PDF attachment,
-it uploads that PDF to hjfy.top's document mode. It does the same when the
-service explicitly reports that the arXiv paper has no LaTeX source. A missing
-PDF prompts you to add one or enter an arXiv ID. The web service requires
-sign-in and limits uploads to 50 MB.
+The plugin first searches the item URL, DOI, Extra field, and attachment
+metadata for an arXiv ID. When found, it prefers arXiv source translation for
+better layout. If no ID is found, or the service explicitly reports no LaTeX
+source, it uploads the item's source PDF to hjfy.top document mode. Processing
+the PDF usually takes longer, and the layout depends on the source PDF. A
+missing PDF prompts you to add one or enter an arXiv ID. Uploads require
+sign-in and are limited to 50 MB. Identical files may share translation results;
+do not upload private documents.
 
 ### Enter an arXiv address
 
@@ -98,7 +102,8 @@ the current Zotero profile.
 Use the `译` button on the left side of the item toolbar to open the task panel.
 Click it again, use the close button, or press `Esc` to dismiss the panel. A
 completed attachment is named `Chinese Translation - arxiv2zh`, with a file name
-such as `{arxiv-id}_zh_CN.pdf`.
+such as `{arxiv-id}_zh_CN.pdf`. PDF upload mode uses
+`{source-name-without-.pdf}_zh_CN.pdf`.
 
 ## Preferences
 
