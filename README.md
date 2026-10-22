@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml"><img src="https://github.com/kongyan66/arxiv2zh/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/v/release/kongyan66/arxiv2zh" alt="GitHub Release"></a>
-  <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/downloads/kongyan66/arxiv2zh/total?logo=github" alt="Downloads"></a>
+  <a href="https://github.com/kongyan66/arxiv2zh/releases"><img src="https://img.shields.io/github/downloads/kongyan66/arxiv2zh/arxiv2zh.xpi?logo=github&amp;displayAssetName=false&amp;label=%E7%B4%AF%E8%AE%A1%E4%B8%8B%E8%BD%BD" alt="插件累计下载次数"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/kongyan66/arxiv2zh" alt="AGPL-3.0-or-later"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-7-CC2936?logo=zotero&amp;logoColor=white" alt="Zotero 7"></a>
   <a href="https://www.zotero.org/download/"><img src="https://img.shields.io/badge/Zotero-8-E76F2E?logo=zotero&amp;logoColor=white" alt="Zotero 8"></a>
